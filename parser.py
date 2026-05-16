@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class Drone:
     pass
 
@@ -18,12 +19,13 @@ class Connection:
 class Maps:
     def __init__(self) -> None:
         self.hubs: list[Hub] = []
-        self.connections : list[Connection] = []
+        self.connections: list[Connection] = []
         self.start_hub: Hub | None = None
         self.end_hub: Hub | None = None
 
     def is_valid(self) -> None:
         ...
+
 
 class Parser:
     def __init__(self, file: str) -> None:
@@ -95,7 +97,8 @@ class Parser:
         except FileNotFoundError:
             raise FileNotFoundError(f"File: {self.file} not found.") from None
         except PermissionError:
-            raise FileNotFoundError(f"File: {self.file} permission denied.") from None
+            raise FileNotFoundError(
+                f"File: {self.file} permission denied.") from None
         except Exception:
             raise Exception("Error appends during parsing.")
         else:
