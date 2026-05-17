@@ -6,6 +6,24 @@
 
 # Resources
 
+## IA
+- learning how to use Regex for parsing
+
+## doc
+- https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124 color ansi
+
+
 # Algorithm choices and implementation strategy
 
 # Visual representation features
+
+[x]supprimer commentaires et lignes vides
+[x]chercher premiere ligne nb drones
+[x]checker le regex pour chaque ligne entre celui des hubs et celui des connexions
+[x]ensuite creer les objets hub et connexion
+[]gerer les metadatas
+[]transformer en dict cle valeur
+[]verifier les cles valeur
+[]les ajouter a la map
+[]verifier que la map est coherente (connexion sans duplication, un seul start, un seul end)
+
