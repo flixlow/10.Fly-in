@@ -1,31 +1,18 @@
 from pydantic import BaseModel, Field
 from re import Pattern
 from typing import Any
+from enum import Enum, auto
 import re
-
-
-class Drone:
-    pass
 
 
 class Hub(BaseModel):
     name: str = Field()
     x: int
     y: int
-    flag: bool | None = Field(default=None)
-    metadata: str | None = Field(default=None)
-
-    # def model_post_init(self):
-    # checker les metadatas
-    # All metadata is optional and enclosed in brackets [...]
-    # with default values:
-    # zone=<type> (default: normal)
-    # color=<value> (default: none)
-    # max_drones=<number> (default: 1) -
-    # Maximum drones that can occupy this
-    # zone simultaneously
-    # Tags inside brackets can appear in any order.
-    # pass
+    position: bool | None = Field(default=None)
+    zone: str | None = Field(default=None)
+    color: str | None = Field(default=None)
+    max_drones: int | None = Field(default=None)
 
 
 class Connection(BaseModel):
@@ -50,6 +37,12 @@ class Map:
         # if (connection.start == start and connection.end == end)\
         # or (connection.start == end and connection.end == start):
         # raise ValueError(f"duplicated connections: {start}-{end}.")
+
+
+class Zone(Enum):
+    START = auto()
+    HUB = auto()
+    END = auto()
 
 
 class Parser:
@@ -94,14 +87,43 @@ class Parser:
             raise FileNotFoundError(f"File: {self.file} not found.")
         except PermissionError:
             raise PermissionError(f"File: {self.file} permission denied.")
+        except IsADirectoryError:
+            raise IsADirectoryError(f"{self.file} is a directory.")
 
-    def create_hub(self, line: str, flag: bool | None = None) -> None:
+    def validate_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+        for k, v in metadata.items():
+            match k:
+                case "zone":
+                    pass
+                case "color":
+                    pass
+                case "max_drones":
+                    pass
+                case _:
+                    raise ValueError(
+                        "Metadata must be formated: ",
+                        "zone=<type>, ",
+                        "color=<value>, ",
+                        "max_drones=<number>"
+                    )
+        return metadata
+
+    def create_hub(self, line: str, position: bool | None = None) -> None:
         tab = self.hub.fullmatch(line)
         if not tab:
             raise ValueError(f"Line doesn't match expected format: {line}.")
-        hub = {"name": tab.group(1), "x": tab.group(2), "y": tab.group(3)}
-        if flag is not None:
-            hub["flag"] = flag
+        name, x, y, metadata = tab.groups()
+        hub: dict[str, Any] = {"name": name, "x": x, "y": y}
+        if position is not None:
+            hub["position"] = position
+        if metadata:
+            processed: dict[str, str | int] = {}
+            for item in metadata.split():
+                if '=' not in item:
+                    raise ValueError(f"Invalid metadata: {item}.")
+                key, value = item.split("=", 1)
+                processed[key] = value
+            hub.update(self.validate_metadata(processed))
         self.map.hubs.append(Hub(**hub))
 
     def create_connection(self, line: str) -> None:
