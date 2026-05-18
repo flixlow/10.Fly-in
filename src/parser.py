@@ -18,6 +18,7 @@ class Parser:
         self.first_line: bool = False
         self.start_hub: bool = False
         self.end_hub: bool = False
+        # self.nb_drones: int = 0
         self.map = Map()
 
     def open(self, file: str) -> list[str]:
@@ -45,7 +46,7 @@ class Parser:
 
     def check_line(self, line: str) -> None:
         if line.startswith("nb_drones:"):
-            self.nb_drones(line.removeprefix("nb_drones:"))
+            self.check_nb_drones(line.removeprefix("nb_drones:"))
         elif line.startswith("start_hub:"):
             self.create_hub(line.removeprefix("start_hub:"), True)
         elif line.startswith("hub:"):
@@ -160,7 +161,7 @@ class Parser:
             case _:
                 raise MetadataError(f"Unknown key for metadata: '{key}'.")
 
-    def nb_drones(self, value: str) -> None:
+    def check_nb_drones(self, value: str) -> None:
         if self.first_line is True:
             raise ValueError("First line must begin with 'nb_drones'.")
         try:

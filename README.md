@@ -36,7 +36,7 @@
 [x]gray issue default
 [x]same thing for zone
 
-[]max drones for start and end cant't be inferior to nb_drones
+[]max drones for start and end can't be inferior to nb_drones
     end_hub: goal 3 0 [color=red max_drones=0]
     nb_drones: 2
 
