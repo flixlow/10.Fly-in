@@ -7,13 +7,14 @@ def main() -> None:
     if len(av) != 2:
         raise ValueError("please check input command line arguments.")
     parser = Parser(av[1])
-    map = parser.validate_and_parse()
-    for hub in map.hubs:
-        print(hub)
+    parser.validate_and_parse()
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
+        raise Exception
         print(f"\n\033[1;31m[ERROR]\033[0m\n{e}")
+    else:
+        print("\033[1;32m[END OF THE PROGRAM]\033[0m")

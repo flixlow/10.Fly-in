@@ -1,8 +1,41 @@
 from pydantic import BaseModel, Field
 from re import Pattern
 from typing import Any
-from enum import Enum, auto
+from enum import Enum
 import re
+
+
+class Color(Enum):
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+    WHITE = "white"
+    BLACK = "black"
+    YELLOW = "yellow"
+    GRAY = "gray"
+    CYAN = "cyan"
+    MAGENTA = "magenta"
+    ORANGE = "orange"
+    PURPLE = "purple"
+
+
+class MapError(Exception):
+    ...
+
+
+class MetadataError(Exception):
+    def __init__(
+            self,
+            message: str = "zone=<type>, color=<value>, max_drones=<number>"
+            ) -> None:
+        super().__init__(message)
+
+
+class Zone(Enum):
+    NORMAL = "normal"
+    BLOCKED = "blocked"
+    RESTRICTED = "restricted"
+    PRIORITY = "priority"
 
 
 class Hub(BaseModel):
@@ -11,7 +44,7 @@ class Hub(BaseModel):
     y: int
     position: bool | None = Field(default=None)
     zone: str | None = Field(default=None)
-    color: str | None = Field(default=None)
+    color: Color | None = Field(default=None)
     max_drones: int | None = Field(default=None)
 
 
@@ -27,22 +60,29 @@ class Map:
         self.hubs: list[Hub] = []
         self.connections: list[Connection] = []
 
+    def check_start_and_end(self) -> None:
+        n_start = 0
+        n_end = 0
+        for hub in self.hubs:
+            if hub.position is None:
+                continue
+            if hub.position is True:
+                n_start += 1
+            if hub.position is False:
+                n_end += 1
+        if n_start != 1 or n_end != 1:
+            raise MapError("Map should contain exaclty one start and one end.")
+
+    def check_connection(self) -> None:
+        for i in self.connections:
+            for j in self.connections:
+                if ((i.start, i.end) == (j.start, j.end) or (i.start, i.end) == (j.end, j.start)):
+                    raise ValueError(
+                        f"duplicated connections: {i.start}-{i.end}.")
+
     def is_valid(self) -> None:
-        ...
-        # if self.start_hub is not None:
-        # raise Exception("More than one start hub in input file.")
-        # if self.end_hub is not None:
-        # raise Exception("More than one end hub in input file.")
-        # for connection in self.map.connections:
-        # if (connection.start == start and connection.end == end)\
-        # or (connection.start == end and connection.end == start):
-        # raise ValueError(f"duplicated connections: {start}-{end}.")
-
-
-class Zone(Enum):
-    START = auto()
-    HUB = auto()
-    END = auto()
+        self.check_start_and_end()
+        self.check_connection()
 
 
 class Parser:
@@ -90,24 +130,6 @@ class Parser:
         except IsADirectoryError:
             raise IsADirectoryError(f"{self.file} is a directory.")
 
-    def validate_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
-        for k, v in metadata.items():
-            match k:
-                case "zone":
-                    pass
-                case "color":
-                    pass
-                case "max_drones":
-                    pass
-                case _:
-                    raise ValueError(
-                        "Metadata must be formated: ",
-                        "zone=<type>, ",
-                        "color=<value>, ",
-                        "max_drones=<number>"
-                    )
-        return metadata
-
     def create_hub(self, line: str, position: bool | None = None) -> None:
         tab = self.hub.fullmatch(line)
         if not tab:
@@ -141,6 +163,33 @@ class Parser:
         if tab.group(3):
             connection["max_link_capacity"] = tab.group(3)
         self.map.connections.append(Connection(**connection))
+
+    def validate_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+        formated: dict[str, Any] = {}
+        for k, v in metadata.items():
+            match k:
+                case "zone":
+                    for z in Zone:
+                        if v == z.value:
+                            formated["zone"] = z
+                    if not formated.get("zone"):
+                        raise MetadataError(f"Unknown zone type: {v}.")
+                case "color":
+                    try:
+                        formated["color"] = Color[v]
+                    except KeyError:
+                        formated["color"] = Color("gray")
+                case "max_drones":
+                    try:
+                        formated["max_drones"] = int(v)
+                        if v < 0:
+                            raise MetadataError
+                    except MetadataError:
+                        raise MetadataError(
+                            f"max_drones must be a non negative int: {v}.")
+                case _:
+                    raise MetadataError
+        return formated
 
     def nb_drones(self, value: str) -> None:
         if self.first_line is True:
