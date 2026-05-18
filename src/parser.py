@@ -8,11 +8,10 @@ import re
 class Parser:
     def __init__(self, file: str) -> None:
         self.lines: list[str] = self.open(file)
-        self.file: str = file
+        self.map = Map()
         self.names: list[str] = []
         self.connections: list[set[str]] = []
         self.coordinates: list[tuple[int, int]] = []
-        self.map = Map()
         self.hub_pattern: Pattern = re.compile(
             r"^\s+(\w+)\s+(-?\d+)\s+(-?\d+)(?:\s+\[([^\]]+)\])?$")
         self.connection_pattern: Pattern = re.compile(
@@ -21,50 +20,56 @@ class Parser:
         self.start_hub: bool = False
         self.end_hub: bool = False
 
-    def validate(self) -> Map:
-        for line in self.lines:
-            if line == "" or line.startswith('#'):
-                continue
-            elif line.startswith("nb_drones:"):
-                self.nb_drones(line.removeprefix("nb_drones:"))
-            elif line.startswith("start_hub:"):
-                self.create_hub(line.removeprefix("start_hub:"), True)
-            elif line.startswith("hub:"):
-                self.create_hub(line.removeprefix("hub:"))
-            elif line.startswith("end_hub:"):
-                self.create_hub(line.removeprefix("end_hub:"), False)
-            elif line.startswith("connection:"):
-                self.create_connection(line.removeprefix("connection:"))
-            else:
-                raise ValueError(f"Unvalid line: {line}")
-            if not self.first_line:
-                self.first_line = True
-        return self.map
-
     def open(self, file: str) -> list[str]:
         try:
             with open(file) as f:
                 return f.read().splitlines()
         except FileNotFoundError:
-            raise FileNotFoundError(f"File: {self.file} not found.")
+            raise FileNotFoundError(f"File: {file} not found.")
         except PermissionError:
-            raise PermissionError(f"File: {self.file} permission denied.")
+            raise PermissionError(f"File: {file} permission denied.")
         except IsADirectoryError:
-            raise IsADirectoryError(f"{self.file} is a directory.")
+            raise IsADirectoryError(f"{file} is a directory.")
+
+    def validate(self) -> Map:
+        for i, line in enumerate(self.lines, start=1):
+            if line == "" or line.startswith('#'):
+                continue
+            try:
+                self.check_line(line)
+            except Exception as e:
+                raise type(e)(f"{e}\nLine {i}: {line}") from e
+            if not self.first_line:
+                self.first_line = True
+        return self.map
+
+    def check_line(self, line: str) -> None:
+        if line.startswith("nb_drones:"):
+            self.nb_drones(line.removeprefix("nb_drones:"))
+        elif line.startswith("start_hub:"):
+            self.create_hub(line.removeprefix("start_hub:"), True)
+        elif line.startswith("hub:"):
+            self.create_hub(line.removeprefix("hub:"))
+        elif line.startswith("end_hub:"):
+            self.create_hub(line.removeprefix("end_hub:"), False)
+        elif line.startswith("connection:"):
+            self.create_connection(line.removeprefix("connection:"))
+        else:
+            raise MapError
 
     def create_hub(self, line: str, position: bool | None = None) -> None:
         tab = self.hub_pattern.fullmatch(line)
         if not tab:
             raise HubError(f"Line doesn't match expected format: {line}.")
+
         name, x, y, metadata = tab.groups()
         if name in self.names:
             raise HubError(f"Duplicated hub name: {name}")
-        else:
-            self.names.append(name)
+        self.names.append(name)
+
         if (x, y) in self.coordinates:
             raise HubError(f"Duplicated hub coordinates: {name} ({x}, {y})")
-        else:
-            self.coordinates.append((x, y))
+        self.coordinates.append((int(x), int(y)))
 
         hub: dict[str, Any] = {"name": name, "x": x, "y": y}
         if position is not None:
@@ -113,37 +118,47 @@ class Parser:
             self.end_hub = True
 
     def validate_metadata(self, metadata: str) -> dict[str, Any]:
-        formated: dict[str, Any] = {}
-
+        multiple_declaration: list[str] = []
+        ret: dict[str, Any] = {}
         for item in metadata.split():
             if '=' not in item:
                 raise ValueError(f"Invalid metadata: {item}.")
 
-            k, v = item.split("=", 1)
-            match k:
-                case "zone":
-                    for z in Zone:
-                        if v == z.value:
-                            formated["zone"] = z
-                    if not formated.get("zone"):
-                        raise MetadataError(f"Unknown zone type: {v}.")
-                case "color":
-                    try:
-                        formated["color"] = Color[v]
-                    except KeyError:
-                        formated["color"] = Color("gray")
-                case "max_drones":
-                    try:
-                        formated["max_drones"] = int(v)
-                        if formated["max_drones"] < 0:
-                            raise MetadataError
-                    except MetadataError:
-                        raise MetadataError(
-                            f"max_drones must be a non negative int: {v}.")
-                case _:
-                    raise MetadataError
+            key, value = item.split("=", 1)
+            if key in multiple_declaration:
+                raise MetadataError(f"multiple declarations for {key}.")
+            ret.update(self.check_data(key, value))
+            multiple_declaration.append(key)
 
-        return formated
+        return ret
+
+    def check_data(self, key: str, value: str) -> dict[str, Any]:
+        if value == '':
+            raise MetadataError(f"Empty metadata input for {key}.")
+        match key:
+            case "zone":
+                try:
+                    return ({"zone": Zone(value)})
+                except ValueError:
+                    raise MetadataError(f"'{value}' is not a valid zone type.")
+            case "color":
+                try:
+                    return ({"color": Color(value.lower())})
+                except ValueError:
+                    print("\033[1;38;5;208m[WARNING]\033[0m",
+                          f" '{value}' color is not a known color.")
+                    return ({"color": Color.GRAY})
+            case "max_drones":
+                try:
+                    ret = int(value)
+                    if ret < 0:
+                        raise ValueError
+                    return ({"max_drones": ret})
+                except ValueError:
+                    raise MetadataError(
+                        f"max_drones must be a non negative int: '{value}'.")
+            case _:
+                raise MetadataError(f"Unknown key for metadata: '{key}'.")
 
     def nb_drones(self, value: str) -> None:
         if self.first_line is True:

@@ -32,3 +32,30 @@
 []verifier que la map est coherente (connexion sans duplication, un seul start, un seul end)
 []verifier les noms des hub qui ne doivent pas etre dupliqué
 
+[x]color multiple declaration
+[x]gray issue default
+[x]same thing for zone
+
+end_hub: goal 3 0 [color=red max_drones=0]
+nb_drones: 2
+
+
+connection: start-waypoint1
+start_hub: start 0 0 [color=green]
+hub: waypoint1 1 0 [color=blue]
+hub: waypoint2 2 0 [color=blue]
+connection: waypoint2-goal [max_link_capacity=2 max_link_capacity=2]
+
+
+
+connection: startewgwgq-waypoint1
+[ERROR] cannot access local variable 'start_hub' where it is not associated with a value
+
+
+        if start_hub is None or end_hub is None:
+            raise ConnectionError(f"Unknown hub for connection: {line}.")
+        connection: dict[str, Any] = {"start": start_hub, "end": end_hub}
+
+
+end_hub: goal 3 0 [zone=]
+end_hub: goal 3 0 [color=]

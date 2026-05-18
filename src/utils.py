@@ -28,7 +28,7 @@ class Hub(BaseModel):
     x: int
     y: int
     position: bool | None = Field(default=None)
-    zone: str | None = Field(default=None)
+    zone: Zone | None = Field(default=None)
     color: Color | None = Field(default=None)
     max_drones: int | None = Field(default=None)
 
