@@ -11,7 +11,7 @@ def main() -> None:
     for hub in map.hubs:
         print("\033[1;34m[HUB]\033[0m:", hub)
     for con in map.connections:
-        print("\033[1;35m[CONNECTION]\033[0m:", con.start, con.end)
+        print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, con.end.name)
 
 
 if __name__ == "__main__":

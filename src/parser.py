@@ -1,24 +1,24 @@
+import re
+from typing import Any
+from re import Pattern
 from .utils import Map, Hub, Connection, Zone, Color
 from .error import MapError, HubError, ConnectionError, MetadataError
-from re import Pattern
-from typing import Any
-import re
 
 
 class Parser:
     def __init__(self, file: str) -> None:
         self.lines: list[str] = self.open(file)
-        self.map = Map()
-        self.names: list[str] = []
-        self.connections: list[set[str]] = []
-        self.coordinates: list[tuple[int, int]] = []
-        self.hub_pattern: Pattern = re.compile(
+        self.hub_pattern: Pattern[str] = re.compile(
             r"^\s+(\w+)\s+(-?\d+)\s+(-?\d+)(?:\s+\[([^\]]+)\])?$")
-        self.connection_pattern: Pattern = re.compile(
+        self.connection_pattern: Pattern[str] = re.compile(
             r"^\s+(\w+)-(\w+)(?:\s+\[max_link_capacity=(\d+)\])?$")
+        self.names: list[str] = []
+        self.coordinates: list[tuple[int, int]] = []
+        self.connections: list[set[str]] = []
         self.first_line: bool = False
         self.start_hub: bool = False
         self.end_hub: bool = False
+        self.map = Map()
 
     def open(self, file: str) -> list[str]:
         try:
