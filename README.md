@@ -23,11 +23,12 @@
 [x]chercher premiere ligne nb drones
 [x]checker le regex pour chaque ligne entre celui des hubs et celui des connexions
 [x]ensuite creer les objets hub et connexion
-[]gerer les metadatas
-[]transformer en dict cle valeur
-[]verifier les clés valeur
-[]plusieurs meme metadata dans les []
+[x]gerer les metadatas
+[x]transformer en dict cle valeur
+[x]verifier les clés valeur
+[x]plusieurs meme metadata dans les []
 []changer le bool | None par l Enum
-[]les ajouter a la map
+[x]les ajouter a la map
 []verifier que la map est coherente (connexion sans duplication, un seul start, un seul end)
+[]verifier les noms des hub qui ne doivent pas etre dupliqué
 

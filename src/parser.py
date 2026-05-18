@@ -1,105 +1,25 @@
-from pydantic import BaseModel, Field
+from .utils import Map, Hub, Connection, Zone, Color
+from .error import MapError, HubError, ConnectionError, MetadataError
 from re import Pattern
 from typing import Any
-from enum import Enum
 import re
-
-
-class Color(Enum):
-    RED = "red"
-    GREEN = "green"
-    BLUE = "blue"
-    WHITE = "white"
-    BLACK = "black"
-    YELLOW = "yellow"
-    GRAY = "gray"
-    CYAN = "cyan"
-    MAGENTA = "magenta"
-    ORANGE = "orange"
-    PURPLE = "purple"
-
-
-class MapError(Exception):
-    ...
-
-
-class MetadataError(Exception):
-    def __init__(
-            self,
-            message: str = "zone=<type>, color=<value>, max_drones=<number>"
-            ) -> None:
-        super().__init__(message)
-
-
-class Zone(Enum):
-    NORMAL = "normal"
-    BLOCKED = "blocked"
-    RESTRICTED = "restricted"
-    PRIORITY = "priority"
-
-
-class Hub(BaseModel):
-    name: str = Field()
-    x: int
-    y: int
-    position: bool | None = Field(default=None)
-    zone: str | None = Field(default=None)
-    color: Color | None = Field(default=None)
-    max_drones: int | None = Field(default=None)
-
-
-class Connection(BaseModel):
-    start: Hub
-    end: Hub
-    max_link_capacity: int | None = Field(default=None)
-
-
-class Map:
-    def __init__(self) -> None:
-        self.nb_drones: int | None = None
-        self.hubs: list[Hub] = []
-        self.connections: list[Connection] = []
-
-    def check_start_and_end(self) -> None:
-        n_start = 0
-        n_end = 0
-        for hub in self.hubs:
-            if hub.position is None:
-                continue
-            if hub.position is True:
-                n_start += 1
-            if hub.position is False:
-                n_end += 1
-        if n_start != 1 or n_end != 1:
-            raise MapError("Map should contain exaclty one start and one end.")
-
-    def check_connection(self) -> None:
-        for i in self.connections:
-            for j in self.connections:
-                if ((i.start, i.end) == (j.start, j.end) or (i.start, i.end) == (j.end, j.start)):
-                    raise ValueError(
-                        f"duplicated connections: {i.start}-{i.end}.")
-
-    def is_valid(self) -> None:
-        self.check_start_and_end()
-        self.check_connection()
 
 
 class Parser:
     def __init__(self, file: str) -> None:
+        self.lines: list[str] = self.open(file)
         self.file: str = file
-        self.lines: list[str]
+        self.connections: list[set[str]] = []
         self.map = Map()
-        self.hub: Pattern = re.compile(
+        self.hub_pattern: Pattern = re.compile(
             r"^\s+(\w+)\s+(-?\d+)\s+(-?\d+)(?:\s+\[([^\]]+)\])?$")
-        self.connection: Pattern = re.compile(
+        self.connection_pattern: Pattern = re.compile(
             r"^\s+(\w+)-(\w+)(?:\s+\[max_link_capacity=(\d+)\])?$")
         self.first_line: bool = False
         self.start_hub: bool = False
         self.end_hub: bool = False
 
-    def validate_and_parse(self) -> Map:
-        self.open()
+    def validate(self) -> Map:
         for line in self.lines:
             if line == "" or line.startswith('#'):
                 continue
@@ -119,10 +39,10 @@ class Parser:
                 self.first_line = True
         return self.map
 
-    def open(self) -> None:
+    def open(self, file: str) -> list[str]:
         try:
-            with open(self.file) as f:
-                self.lines = f.read().split("\n")
+            with open(file) as f:
+                return f.read().splitlines()
         except FileNotFoundError:
             raise FileNotFoundError(f"File: {self.file} not found.")
         except PermissionError:
@@ -131,42 +51,64 @@ class Parser:
             raise IsADirectoryError(f"{self.file} is a directory.")
 
     def create_hub(self, line: str, position: bool | None = None) -> None:
-        tab = self.hub.fullmatch(line)
+        tab = self.hub_pattern.fullmatch(line)
         if not tab:
-            raise ValueError(f"Line doesn't match expected format: {line}.")
+            raise HubError(f"Line doesn't match expected format: {line}.")
         name, x, y, metadata = tab.groups()
         hub: dict[str, Any] = {"name": name, "x": x, "y": y}
         if position is not None:
+            self.check_start_and_end(name, position)
             hub["position"] = position
         if metadata:
-            processed: dict[str, str | int] = {}
-            for item in metadata.split():
-                if '=' not in item:
-                    raise ValueError(f"Invalid metadata: {item}.")
-                key, value = item.split("=", 1)
-                processed[key] = value
-            hub.update(self.validate_metadata(processed))
+            hub.update(self.validate_metadata(metadata))
         self.map.hubs.append(Hub(**hub))
 
+    def check_duplicated_connection(self, start: str, end: str) -> None:
+        start_end: set[str] = {start, end}
+        if start_end in self.connections:
+            raise ConnectionError(f"Duplicated connection: {start_end}")
+        else:
+            self.connections.append(start_end)
+
     def create_connection(self, line: str) -> None:
-        tab = self.connection.fullmatch(line)
+        tab = self.connection_pattern.fullmatch(line)
         if not tab:
-            raise ValueError(f"Line doesn't match expected format: {line}.")
+            raise ConnectionError(f"Line doesn't match regex format: {line}.")
+        start, end, metadata = tab.groups()
+        if start == end:
+            raise ConnectionError(f"Start must be different from end: {line}.")
+        self.check_duplicated_connection(start, end)
         for hub in self.map.hubs:
-            if tab.group(1) == hub.name:
-                start = hub
-            elif tab.group(2) == hub.name:
-                end = hub
-        if start is None or end is None:
-            raise ValueError(f"Unknown hub for connection: {line}")
-        connection: dict[str, Any] = {"start": start, "end": end}
-        if tab.group(3):
-            connection["max_link_capacity"] = tab.group(3)
+            if start == hub.name:
+                start_hub = hub
+            elif end == hub.name:
+                end_hub = hub
+        if start_hub is None or end_hub is None:
+            raise ConnectionError(f"Unknown hub for connection: {line}.")
+        connection: dict[str, Any] = {"start": start_hub, "end": end_hub}
+        if metadata:
+            connection["max_link_capacity"] = metadata
+
         self.map.connections.append(Connection(**connection))
 
-    def validate_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+    def check_start_and_end(self, name: str, position: bool) -> None:
+        if position and self.start_hub:
+            raise MapError(f"Duplicated start_hub: {name}")
+        elif position and not self.start_hub:
+            self.start_hub = True
+        if not position and self.end_hub:
+            raise MapError(f"Duplicated end_hub: {name}")
+        elif not position and not self.end_hub:
+            self.end_hub = True
+
+    def validate_metadata(self, metadata: str) -> dict[str, Any]:
         formated: dict[str, Any] = {}
-        for k, v in metadata.items():
+
+        for item in metadata.split():
+            if '=' not in item:
+                raise ValueError(f"Invalid metadata: {item}.")
+
+            k, v = item.split("=", 1)
             match k:
                 case "zone":
                     for z in Zone:
@@ -182,13 +124,14 @@ class Parser:
                 case "max_drones":
                     try:
                         formated["max_drones"] = int(v)
-                        if v < 0:
+                        if formated["max_drones"] < 0:
                             raise MetadataError
                     except MetadataError:
                         raise MetadataError(
                             f"max_drones must be a non negative int: {v}.")
                 case _:
                     raise MetadataError
+
         return formated
 
     def nb_drones(self, value: str) -> None:
