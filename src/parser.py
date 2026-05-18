@@ -9,7 +9,9 @@ class Parser:
     def __init__(self, file: str) -> None:
         self.lines: list[str] = self.open(file)
         self.file: str = file
+        self.names: list[str] = []
         self.connections: list[set[str]] = []
+        self.coordinates: list[tuple[int, int]] = []
         self.map = Map()
         self.hub_pattern: Pattern = re.compile(
             r"^\s+(\w+)\s+(-?\d+)\s+(-?\d+)(?:\s+\[([^\]]+)\])?$")
@@ -55,6 +57,15 @@ class Parser:
         if not tab:
             raise HubError(f"Line doesn't match expected format: {line}.")
         name, x, y, metadata = tab.groups()
+        if name in self.names:
+            raise HubError(f"Duplicated hub name: {name}")
+        else:
+            self.names.append(name)
+        if (x, y) in self.coordinates:
+            raise HubError(f"Duplicated hub coordinates: {name} ({x}, {y})")
+        else:
+            self.coordinates.append((x, y))
+
         hub: dict[str, Any] = {"name": name, "x": x, "y": y}
         if position is not None:
             self.check_start_and_end(name, position)
