@@ -18,7 +18,6 @@ class Parser:
         self.first_line: bool = False
         self.start_hub: bool = False
         self.end_hub: bool = False
-        # self.nb_drones: int = 0
         self.map = Map()
 
     def open(self, file: str) -> list[str]:
@@ -77,36 +76,53 @@ class Parser:
             self.check_start_and_end(name, position)
             hub["position"] = position
         if metadata:
-            hub.update(self.validate_metadata(metadata))
+            hub.update(self.check_metadata(metadata, position))
         self.map.hubs.append(Hub(**hub))
-
-    def check_duplicated_connection(self, start: str, end: str) -> None:
-        start_end: set[str] = {start, end}
-        if start_end in self.connections:
-            raise ConnectionError(f"Duplicated connection: {start_end}")
-        else:
-            self.connections.append(start_end)
 
     def create_connection(self, line: str) -> None:
         tab = self.connection_pattern.fullmatch(line)
         if not tab:
             raise ConnectionError(f"Line doesn't match regex format: {line}.")
         start, end, metadata = tab.groups()
-        if start == end:
-            raise ConnectionError(f"Start must be different from end: {line}.")
-        self.check_duplicated_connection(start, end)
+        self.check_connection(start, end)
         for hub in self.map.hubs:
             if start == hub.name:
                 start_hub = hub
             elif end == hub.name:
                 end_hub = hub
-        if start_hub is None or end_hub is None:
-            raise ConnectionError(f"Unknown hub for connection: {line}.")
         connection: dict[str, Any] = {"start": start_hub, "end": end_hub}
         if metadata:
+            metadata = int(metadata)
+            if metadata == 0:
+                raise ConnectionError("'max_link_capacity' must be positive.")
             connection["max_link_capacity"] = metadata
-
         self.map.connections.append(Connection(**connection))
+
+    def check_metadata(self, metadata: str,
+                       pos: bool | None = None) -> dict[str, Any]:
+        multiple_declaration: list[str] = []
+        ret: dict[str, Any] = {}
+        for item in metadata.split():
+            if '=' not in item:
+                raise ValueError(f"Invalid metadata: {item}.")
+            key, value = item.split("=", 1)
+            if key in multiple_declaration:
+                raise MetadataError(f"multiple declarations for {key}.")
+            ret.update(self.check_one_data(key, value, pos))
+            multiple_declaration.append(key)
+        return ret
+
+    def check_connection(self, start: str, end: str) -> None:
+        start_end: set[str] = {start, end}
+        hubs_name = [hub.name for hub in self.map.hubs]
+        if start not in hubs_name or end not in hubs_name:
+            raise ConnectionError(f"Unknown hub: {start_end}")
+        if start == end:
+            raise ConnectionError("Start must be different from end:")
+        if start_end in self.connections:
+            raise ConnectionError(f"Duplicated connections: {start_end}")
+        else:
+            self.connections.append(start_end)
 
     def check_start_and_end(self, name: str, position: bool) -> None:
         if position and self.start_hub:
@@ -118,22 +134,8 @@ class Parser:
         elif not position and not self.end_hub:
             self.end_hub = True
 
-    def validate_metadata(self, metadata: str) -> dict[str, Any]:
-        multiple_declaration: list[str] = []
-        ret: dict[str, Any] = {}
-        for item in metadata.split():
-            if '=' not in item:
-                raise ValueError(f"Invalid metadata: {item}.")
-
-            key, value = item.split("=", 1)
-            if key in multiple_declaration:
-                raise MetadataError(f"multiple declarations for {key}.")
-            ret.update(self.check_data(key, value))
-            multiple_declaration.append(key)
-
-        return ret
-
-    def check_data(self, key: str, value: str) -> dict[str, Any]:
+    def check_one_data(self, key: str, value: str,
+                       pos: bool | None = None) -> dict[str, Any]:
         if value == '':
             raise MetadataError(f"Empty metadata input for {key}.")
         match key:
@@ -152,12 +154,16 @@ class Parser:
             case "max_drones":
                 try:
                     ret = int(value)
-                    if ret < 0:
+                    if pos is not None:
+                        print("\033[1;38;5;208m[WARNING]\033[0m max drone",
+                              "can't be inferior to nb_drones for start/end.")
+                        return ({"max_drones": self.map.nb_drones})
+                    if ret <= 0:
                         raise ValueError
                     return ({"max_drones": ret})
                 except ValueError:
                     raise MetadataError(
-                        f"max_drones must be a non negative int: '{value}'.")
+                        f"max_drones must be a positive integer: '{value}'.")
             case _:
                 raise MetadataError(f"Unknown key for metadata: '{key}'.")
 

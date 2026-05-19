@@ -30,7 +30,7 @@ class Hub(BaseModel):
     position: bool | None = Field(default=None)
     zone: Zone | None = Field(default=None)
     color: Color | None = Field(default=None)
-    max_drones: int | None = Field(default=None)
+    max_drones: int | None = Field(default=1)
 
 
 class Connection(BaseModel):

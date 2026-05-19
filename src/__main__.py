@@ -3,6 +3,7 @@ from src.parser import Parser
 
 
 def main() -> None:
+    print("\033[1;33m[STARTING PROGRAM]\033[0m")
     av: list[str] = sys.argv
     if len(av) != 2:
         raise ValueError("please check input command line arguments.")
@@ -11,7 +12,8 @@ def main() -> None:
     for hub in map.hubs:
         print("\033[1;34m[HUB]\033[0m:", hub)
     for con in map.connections:
-        print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, con.end.name)
+        print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, end=" ")
+        print(con.end.name, con.max_link_capacity)
 
 
 if __name__ == "__main__":

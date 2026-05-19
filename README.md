@@ -40,7 +40,7 @@
     end_hub: goal 3 0 [color=red max_drones=0]
     nb_drones: 2
 
-[]check if start and end for connection exists or not
+[x]check if start and end for connection exists or not
     connection: start-waypoint1
     start_hub: start 0 0 [color=green]
     hub: waypoint1 1 0 [color=blue]
@@ -53,4 +53,4 @@
         raise ConnectionError(f"Unknown hub for connection: {line}.")
     connection: dict[str, Any] = {"start": start_hub, "end": end_hub}
 
-[]multiple declaration on metadata for connection
+[x]multiple declaration on metadata for connection
