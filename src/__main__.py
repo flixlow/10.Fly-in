@@ -1,16 +1,26 @@
-import sys
+from argparse import ArgumentParser, Namespace
 from src.parser import Parser
+from src.utils import Start, End
+
+
+def command_line() -> Namespace:
+    parser = ArgumentParser()
+    parser.add_argument("--input", default="maps/easy/01_linear_path.txt")
+    return parser.parse_args()
 
 
 def main() -> None:
     print("\033[1;33m[STARTING PROGRAM]\033[0m")
-    av: list[str] = sys.argv
-    if len(av) != 2:
-        raise ValueError("please check input command line arguments.")
-    parser = Parser(av[1])
-    map = parser.validate()
+    command_line_parser = command_line()
+    file_parser = Parser(command_line_parser.input)
+    map = file_parser.validate()
     for hub in map.hubs:
-        print("\033[1;34m[HUB]\033[0m:", hub)
+        if isinstance(hub, Start):
+            print("\033[1;36m[START HUB]\033[0m:", hub)
+        elif isinstance(hub, End):
+            print("\033[1;36m[END HUB]\033[0m:", hub)
+        else:
+            print("\033[1;34m[HUB]\033[0m:", hub)
     for con in map.connections:
         print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, end=" ")
         print(con.end.name, con.max_link_capacity)

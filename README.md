@@ -56,8 +56,8 @@ bcondemi
 lgirard
 [x] raise MapError with description
 [x] Line doesn't match expected format. add format
-[ ] position: bool | None = None :)
-[ ] Start must be different from end. il n'y a pas de start ou de end dans les connections
-[ ] if line == "" or line.startswith('#'): Les commentaires peuvent etre dans une ligne
-[ ] Utiliser argparse
-[ ] Verifier presence de end_hub et start_hub
+[x] position: bool | None = None :)
+[x] Start must be different from end. il n'y a pas de start ou de end dans les connections
+[x] if line == "" or line.startswith('#'): Les commentaires peuvent etre dans une ligne
+[x] Utiliser argparse
+[x] Verifier presence de end_hub et start_hub

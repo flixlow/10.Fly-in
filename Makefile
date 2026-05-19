@@ -1,4 +1,4 @@
-ARG ?= maps/easy/01_linear_path.txt
+ARG ?= --input maps/easy/01_linear_path.txt
 
 install:
 	uv sync

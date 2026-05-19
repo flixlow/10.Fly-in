@@ -27,20 +27,17 @@ class Hub(BaseModel):
     name: str = Field()
     x: int
     y: int
-    position: bool | None = Field(default=None)
     zone: Zone | None = Field(default=Zone.NORMAL)
     color: Color | None = Field(default=Color.GRAY)
     max_drones: int | None = Field(default=1)
 
 
 class Start(Hub):
-    def __init__(self, name, x, y):
-        super().__init__(name, x, y)
+    ...
 
 
 class End(Hub):
-    def __init__(self, name, x, y):
-        super().__init__(name, x, y)
+    ...
 
 
 class Connection(BaseModel):
