@@ -18,6 +18,8 @@
 # Algorithm choices and implementation strategy
 
 # Visual representation features
+
+Parser:
 flauweri
 [x]supprimer commentaires et lignes vides
 [x]chercher premiere ligne nb drones
@@ -61,3 +63,5 @@ lgirard
 [x] if line == "" or line.startswith('#'): Les commentaires peuvent etre dans une ligne
 [x] Utiliser argparse
 [x] Verifier presence de end_hub et start_hub
+
+algo:

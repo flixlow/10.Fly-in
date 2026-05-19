@@ -1,4 +1,4 @@
-ARG ?= --input maps/easy/01_linear_path.txt
+ARG ?= --selector
 
 install:
 	uv sync
@@ -6,7 +6,8 @@ install:
 run:
 	uv run -m src $(ARG)
 
-debug: uv run -m gdb src
+debug:
+	uv run -m pdb -m src
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +

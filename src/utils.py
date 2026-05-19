@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from enum import Enum
 
 
@@ -14,6 +15,12 @@ class Color(Enum):
     MAGENTA = "magenta"
     ORANGE = "orange"
     PURPLE = "purple"
+    BROWN = "brown"
+    MARRON = "maroon"
+    GOLD = "gold"
+    DARKRED = "darkred"
+    VIOLET = "violet"
+    CRIMSON = "crimson"
 
 
 class Zone(Enum):
@@ -27,9 +34,9 @@ class Hub(BaseModel):
     name: str = Field()
     x: int
     y: int
-    zone: Zone | None = Field(default=Zone.NORMAL)
-    color: Color | None = Field(default=Color.GRAY)
-    max_drones: int | None = Field(default=1)
+    zone: Optional[Zone] = Field(default=Zone.NORMAL)
+    color: Optional[Color] = Field(default=Color.GRAY)
+    max_drones: Optional[int] = Field(default=1)
 
 
 class Start(Hub):
