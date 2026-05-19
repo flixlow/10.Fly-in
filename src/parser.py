@@ -38,7 +38,7 @@ class Parser:
             try:
                 self.check_line(line)
             except Exception as e:
-                raise type(e)(f"{e}\nLine {i}: {line}") from e
+                raise type(e)(f"{str(e)}\nLine {i}: {line}")
             if not self.first_line:
                 self.first_line = True
         return self.map
@@ -55,12 +55,13 @@ class Parser:
         elif line.startswith("connection:"):
             self.create_connection(line.removeprefix("connection:"))
         else:
-            raise MapError
+            raise MapError("Unknown line type.")
 
     def create_hub(self, line: str, position: bool | None = None) -> None:
         tab = self.hub_pattern.fullmatch(line)
         if not tab:
-            raise HubError(f"Line doesn't match expected format: {line}.")
+            format = "(start_hub|hub|end_hub) <name> <x> <y> [metadata]"
+            raise HubError(f"Line doesn't match expected format: {format}")
 
         name, x, y, metadata = tab.groups()
         if name in self.names:
@@ -82,7 +83,8 @@ class Parser:
     def create_connection(self, line: str) -> None:
         tab = self.connection_pattern.fullmatch(line)
         if not tab:
-            raise ConnectionError(f"Line doesn't match regex format: {line}.")
+            format = "connection: <name1>-<name2> [metadata]"
+            raise ConnectionError(f"Line doesn't match regex format: {format}")
         start, end, metadata = tab.groups()
         self.check_connection(start, end)
         for hub in self.map.hubs:
@@ -118,7 +120,7 @@ class Parser:
         if start not in hubs_name or end not in hubs_name:
             raise ConnectionError(f"Unknown hub: {start_end}")
         if start == end:
-            raise ConnectionError("Start must be different from end:")
+            raise ConnectionError("Start must be different from end.")
         if start_end in self.connections:
             raise ConnectionError(f"Duplicated connections: {start_end}")
         else:

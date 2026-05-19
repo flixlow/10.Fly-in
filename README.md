@@ -18,7 +18,7 @@
 # Algorithm choices and implementation strategy
 
 # Visual representation features
-
+flauweri
 [x]supprimer commentaires et lignes vides
 [x]chercher premiere ligne nb drones
 [x]checker le regex pour chaque ligne entre celui des hubs et celui des connexions
@@ -32,14 +32,13 @@
 []verifier que la map est coherente (connexion sans duplication, un seul start, un seul end)
 []verifier les noms des hub qui ne doivent pas etre dupliqué
 
+bcondemi
 [x]color multiple declaration
 [x]gray issue default
 [x]same thing for zone
-
-[]max drones for start and end can't be inferior to nb_drones
+[x]max drones for start and end can't be inferior to nb_drones
     end_hub: goal 3 0 [color=red max_drones=0]
     nb_drones: 2
-
 [x]check if start and end for connection exists or not
     connection: start-waypoint1
     start_hub: start 0 0 [color=green]
@@ -52,5 +51,13 @@
     if start_hub is None or end_hub is None:
         raise ConnectionError(f"Unknown hub for connection: {line}.")
     connection: dict[str, Any] = {"start": start_hub, "end": end_hub}
-
 [x]multiple declaration on metadata for connection
+
+lgirard
+[x] raise MapError with description
+[x] Line doesn't match expected format. add format
+[ ] position: bool | None = None :)
+[ ] Start must be different from end. il n'y a pas de start ou de end dans les connections
+[ ] if line == "" or line.startswith('#'): Les commentaires peuvent etre dans une ligne
+[ ] Utiliser argparse
+[ ] Verifier presence de end_hub et start_hub
