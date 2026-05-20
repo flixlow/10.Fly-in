@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from src.parser import Parser
-from src.utils import Start, End
+# from src.utils import Start, End
 from src.display import Displayer
 import questionary
 import os
@@ -8,22 +8,31 @@ import os
 
 def command_line() -> str:
     parser = ArgumentParser()
-    parser.add_argument("--input", default="maps/easy/01_linear_path.txt")
+    parser.add_argument("--input", default=None)
     parser.add_argument("--directory", default="maps")
-    parser.add_argument("--selector", action="store_true")
-
     command_line = parser.parse_args()
-    if not command_line.selector:
-        return command_line.input
 
-    current_path = os.listdir(command_line.directory)
-    while(1):
-        questionary
+    current_path: str = command_line.directory
+    while (True):
+        choices = os.listdir(current_path)
+        r = questionary.select("Please, select:", choices=choices).ask()
+        current_path = f"{current_path}/{r}"
+        if os.path.isfile(current_path):
+            break
+
+    if command_line.input is not None:
+        current_path = command_line.input
+
+    if not current_path.endswith(".txt"):
+        raise ValueError(f"File must be a .txt : {current_path}")
+    return current_path
 
 
 def main() -> None:
     print("\033[1;32m[START OF THE PROGRAM]\033[0m")
-    file_parser = Parser(command_line())
+    file = command_line()
+    print(file)
+    file_parser = Parser(file)
     map = file_parser.validate()
     displayer = Displayer(map)
     displayer.display()
@@ -33,7 +42,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        raise e
+        # raise e
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
         print("\033[1;32m[END OF THE PROGRAM]\033[0m")

@@ -1,4 +1,4 @@
-ARG ?= --selector
+ARG ?=
 
 install:
 	uv sync
