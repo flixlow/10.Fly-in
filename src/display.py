@@ -6,40 +6,40 @@ import json
 class Displayer:
     def __init__(self, map: Map) -> None:
         self.map: Map = map
-        self._set_screen()
-        self._set_padding(0.10)
-        self._set_origin()
-        self._set_max_coordinates()
-        self._set_scales()
-        self._set_colors()
+        self.set_screen()
+        self.set_padding(0.10)
+        self.set_origin()
+        self.set_max_coordinates()
+        self.set_scales()
+        self.set_colors()
 
-    def _set_screen(self) -> None:
+    def set_screen(self) -> None:
         pygame.init()
 
         self.width = pygame.display.Info().current_w * (3/4)
         self.height = pygame.display.Info().current_h * (3/4)
         self.screen = pygame.display.set_mode((self.width, self.height))
 
-    def _set_padding(self, padding: float) -> None:
+    def set_padding(self, padding: float) -> None:
         width_padding: float = self.width * padding
         height_padding: float = self.height * padding
         self.padding = max(width_padding, height_padding)
 
-    def _set_origin(self) -> None:
+    def set_origin(self) -> None:
         self.x_center: float = self.padding
         self.y_center: float = self.height / 2
 
-    def _set_max_coordinates(self) -> None:
+    def set_max_coordinates(self) -> None:
         self.max_x: int = max(1, max([hub.x for hub in self.map.hubs]))
         self.max_y: int = max(1, max([hub.y for hub in self.map.hubs]))
 
-    def _set_scales(self) -> None:
+    def set_scales(self) -> None:
         usable_width = self.width - (self.padding * 2)
         usable_height = self.height - (self.padding * 2)
         self.scale: float = min(usable_width / self.max_x,
                                 usable_height / self.max_y)
 
-    def _set_colors(self) -> None:
+    def set_colors(self) -> None:
         with open("src/assets/themes.json", "r") as f:
             data = json.load(f)
         self.themes = data
@@ -79,6 +79,9 @@ class Displayer:
                 color = hub.color.value
             pygame.draw.circle(self.screen, color, (x, y), 20)
 
+    def display_drones(self) -> None:
+        ...
+
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",
                                 True, self.text_color)
@@ -100,6 +103,7 @@ class Displayer:
 
             self.display_connections()
             self.display_hubs()
+            self.display_drones()
             self.display_text()
 
             pygame.display.flip()
