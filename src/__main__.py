@@ -32,7 +32,7 @@ def main() -> None:
     file = command_line()
     file_parser = Parser(file)
     map = file_parser.validate()
-    displayer = Displayer(map, "white")
+    displayer = Displayer(map)
     displayer.display()
 
 

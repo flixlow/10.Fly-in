@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from pathlib import Path
 from enum import Enum
 
 
@@ -54,7 +55,8 @@ class Connection(BaseModel):
 
 
 class Map:
-    def __init__(self) -> None:
+    def __init__(self, name: str) -> None:
+        self.name = Path(name).stem.replace('_', ' ')
         self.nb_drones: int | None = None
         self.hubs: list[Hub] = []
         self.connections: list[Connection] = []

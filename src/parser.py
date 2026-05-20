@@ -18,7 +18,7 @@ class Parser:
         self.first_line: bool = False
         self.start_hub: bool = False
         self.end_hub: bool = False
-        self.map: Map = Map()
+        self.map: Map = Map(file)
 
     def open(self, file: str) -> list[str]:
         try:
