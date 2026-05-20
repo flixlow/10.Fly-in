@@ -1,8 +1,8 @@
 import re
 from typing import Any
 from re import Pattern
-from .utils import Map, Hub, Connection, Start, End, Zone, Color
-from .error import MapError, HubError, ConnectionError, MetadataError
+from src.utils import Map, Hub, Connection, Start, End, Zone, Color
+from src.error import MapError, HubError, ConnectionError, MetadataError
 
 
 class Parser:

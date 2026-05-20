@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from src.parser import Parser
+from src.algo import PathFinder
 import questionary
 import os
 
@@ -29,9 +30,12 @@ def command_line() -> str:
 def main() -> None:
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
     from src.display import Displayer
+
     file = command_line()
     file_parser = Parser(file)
     map = file_parser.validate()
+    finder = PathFinder(map)
+    finder.find()
     displayer = Displayer(map)
     displayer.display()
 

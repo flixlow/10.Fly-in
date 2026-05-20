@@ -1,6 +1,6 @@
+from .utils import Map
 import pygame
 import json
-from .utils import Map
 
 
 class Displayer:

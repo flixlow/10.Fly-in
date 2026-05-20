@@ -22,6 +22,7 @@ class Color(Enum):
     DARKRED = "darkred"
     VIOLET = "violet"
     CRIMSON = "crimson"
+    LIME = "lime"
 
 
 class Zone(Enum):
