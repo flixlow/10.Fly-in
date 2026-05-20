@@ -1,7 +1,5 @@
 from argparse import ArgumentParser
 from src.parser import Parser
-# from src.utils import Start, End
-from src.display import Displayer
 import questionary
 import os
 
@@ -29,16 +27,17 @@ def command_line() -> str:
 
 
 def main() -> None:
-    print("\033[1;32m[START OF THE PROGRAM]\033[0m")
+    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+    from src.display import Displayer
     file = command_line()
-    print(file)
     file_parser = Parser(file)
     map = file_parser.validate()
-    displayer = Displayer(map)
+    displayer = Displayer(map, "white")
     displayer.display()
 
 
 if __name__ == "__main__":
+    print("\033[1;32m[START OF THE PROGRAM]\033[0m")
     try:
         main()
     except Exception as e:
@@ -46,14 +45,3 @@ if __name__ == "__main__":
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
         print("\033[1;32m[END OF THE PROGRAM]\033[0m")
-
-    # for hub in map.hubs:
-    #     if isinstance(hub, Start):
-    #         print("\033[1;36m[START HUB]\033[0m:", hub)
-    #     elif isinstance(hub, End):
-    #         print("\033[1;36m[END HUB]\033[0m:", hub)
-    #     else:
-    #         print("\033[1;34m[HUB]\033[0m:", hub)
-    # for con in map.connections:
-    #     print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, end=" ")
-    #     print(con.end.name, con.max_link_capacity)

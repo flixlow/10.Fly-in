@@ -64,4 +64,17 @@ lgirard
 [x] Utiliser argparse
 [x] Verifier presence de end_hub et start_hub
 
+debug: 
+    # for hub in map.hubs:
+    #     if isinstance(hub, Start):
+    #         print("\033[1;36m[START HUB]\033[0m:", hub)
+    #     elif isinstance(hub, End):
+    #         print("\033[1;36m[END HUB]\033[0m:", hub)
+    #     else:
+    #         print("\033[1;34m[HUB]\033[0m:", hub)
+    # for con in map.connections:
+    #     print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, end=" ")
+    #     print(con.end.name, con.max_link_capacity)
+
+
 algo:
