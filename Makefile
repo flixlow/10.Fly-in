@@ -21,5 +21,5 @@ lint:
 lint-strict:
 	flake8 src && mypy src --strict
 
-map: maps
+map:
 	cp ~/Downloads/maps.tar.gz . && tar -xf maps.tar.gz && rm maps.tar.gz
