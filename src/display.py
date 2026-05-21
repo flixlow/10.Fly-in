@@ -1,5 +1,5 @@
+import pygame  # type: ignore
 from .utils import Map
-import pygame
 import json
 
 
@@ -78,6 +78,7 @@ class Displayer:
             if hub.color is not None:
                 color = hub.color.value
             pygame.draw.circle(self.screen, color, (x, y), 20)
+            pygame.draw.circle(self.screen, self.line_color, (x, y), 15)
 
     def display_drones(self) -> None:
         ...

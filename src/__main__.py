@@ -1,8 +1,8 @@
-from argparse import ArgumentParser
-from src.parser import Parser
-from src.algo import PathFinder
-import questionary
 import os
+import questionary  # type: ignore
+from argparse import ArgumentParser
+from src.algo import PathFinder
+from src.parser import Parser
 
 
 def command_line() -> str:

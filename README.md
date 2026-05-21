@@ -29,10 +29,10 @@ flauweri
 [x]transformer en dict cle valeur
 [x]verifier les clés valeur
 [x]plusieurs meme metadata dans les []
-[]changer le bool | None par l Enum
+[x]changer le bool | None par l Enum
 [x]les ajouter a la map
-[]verifier que la map est coherente (connexion sans duplication, un seul start, un seul end)
-[]verifier les noms des hub qui ne doivent pas etre dupliqué
+[x]verifier que la map est coherente (connexion sans duplication, un seul start, un seul end)
+[x]verifier les noms des hub qui ne doivent pas etre dupliqué
 
 bcondemi
 [x]color multiple declaration
@@ -76,5 +76,28 @@ debug:
     #     print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, end=" ")
     #     print(con.end.name, con.max_link_capacity)
 
+displayer:
+degradé de fond vibe codé
+    # def shade(self, factor: float) -> tuple[int, int, int]:
+    #     color = self.back_color
+    #     return (
+    #         max(0, min(int(color[0] * factor), 255)),
+    #         max(0, min(int(color[1] * factor), 255)),
+    #         max(0, min(int(color[2] * factor), 255))
+    #     )
+
+    # def draw_gradient(self) -> None:
+    #     bottom = self.shade(0.4)
+    #     top = self.shade(1.5)
+    #     for y in range(round(self.height)):
+    #         ratio = y / self.height
+
+    #         r = top[0] * (1 - ratio) + bottom[0] * ratio
+    #         g = top[1] * (1 - ratio) + bottom[1] * ratio
+    #         b = top[2] * (1 - ratio) + bottom[2] * ratio
+
+    #         pygame.draw.line(self.screen, (r, g, b), (0, y), (self.width, y))
+
+    [ ] probleme affichage sur maze nightmare
 
 algo:
