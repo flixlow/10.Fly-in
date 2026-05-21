@@ -61,7 +61,6 @@ class Map:
         self.nb_drones: int | None = None
         self.hubs: list[Hub] = []
         self.connections: list[Connection] = []
-        self.coordinate_translation
 
     def coordinate_translation(self) -> None:
         min_x = min([hub.x for hub in self.hubs])

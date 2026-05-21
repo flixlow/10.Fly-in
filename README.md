@@ -99,5 +99,7 @@ degradé de fond vibe codé
     #         pygame.draw.line(self.screen, (r, g, b), (0, y), (self.width, y))
 
     [ ] probleme affichage sur maze nightmare
-
+    [ ] est ce que le make import c est une bonne idee ?
+    [ ] self.map.coordinate_translation() shoulds i use this
+    [ ] 
 algo:

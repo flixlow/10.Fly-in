@@ -43,6 +43,7 @@ class Parser:
                 self.first_line = True
         if self.start_hub is False or self.end_hub is False:
             raise MapError("Map is missing start or end hub.")
+        # self.map.coordinate_translation()
         return self.map
 
     def check_line(self, line: str) -> None:

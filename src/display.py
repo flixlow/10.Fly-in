@@ -77,8 +77,8 @@ class Displayer:
             y = self.y_center + self.scale * hub.y
             if hub.color is not None:
                 color = hub.color.value
-            pygame.draw.circle(self.screen, color, (x, y), 20)
-            pygame.draw.circle(self.screen, self.line_color, (x, y), 15)
+            pygame.draw.circle(self.screen, self.line_color, (x, y), 20)
+            pygame.draw.circle(self.screen, color, (x, y), 15)
 
     def display_drones(self) -> None:
         ...

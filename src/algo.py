@@ -1,6 +1,9 @@
 from src.utils import Map
 
 
+# class Network(map: Map)
+
+
 class PathFinder:
     def __init__(self, map: Map) -> None:
         self.map: Map = map
@@ -8,4 +11,4 @@ class PathFinder:
 
     def find(self) -> None:
         ...
-        # while(self.sim_is_running):
+        # +while(self.sim_is_running):
