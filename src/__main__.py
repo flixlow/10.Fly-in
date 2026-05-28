@@ -1,7 +1,7 @@
 import os
 import questionary  # type: ignore
 from argparse import ArgumentParser
-from src.algo import PathFinder
+from src.network import Network
 from src.parser import Parser
 
 
@@ -34,8 +34,8 @@ def main() -> None:
     file = command_line()
     file_parser = Parser(file)
     map = file_parser.validate()
-    finder = PathFinder(map)
-    finder.find()
+    network = Network(map)
+    network.next_step()
     displayer = Displayer(map)
     displayer.display()
 

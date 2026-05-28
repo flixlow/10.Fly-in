@@ -83,7 +83,12 @@ class Parser:
         if hub in (Start, End):
             self.check_start_and_end(name, hub is Start)
             data_hub["max_drones"] = self.map.nb_drones
-        self.map.hubs.append(hub(**data_hub))
+        new = hub(**data_hub)
+        if isinstance(new, Start):
+            self.map.start = new
+        elif isinstance(new, End):
+            self.map.end = new
+        self.map.hubs.append(new)
 
     def create_connection(self, line: str) -> None:
         tab = self.connection_pattern.fullmatch(line)
@@ -103,6 +108,9 @@ class Parser:
             if metadata == 0:
                 raise ConnectionError("'max_link_capacity' must be positive.")
             connection["max_link_capacity"] = metadata
+        new = Connection(**connection)
+        new.start.connections.append(new)
+        new.end.connections.append(new)
         self.map.connections.append(Connection(**connection))
 
     def check_metadata(self, metadata: str) -> dict[str, Any]:

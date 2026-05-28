@@ -101,5 +101,7 @@ degradé de fond vibe codé
     [ ] probleme affichage sur maze nightmare
     [ ] est ce que le make import c est une bonne idee ?
     [ ] self.map.coordinate_translation() shoulds i use this
-    [ ] 
 algo:
+    [ ] lire doc dict.setdefault 
+
+

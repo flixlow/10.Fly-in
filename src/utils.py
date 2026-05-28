@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 from pathlib import Path
 from enum import Enum
 
@@ -33,12 +32,21 @@ class Zone(Enum):
 
 
 class Hub(BaseModel):
-    name: str = Field()
+    name: str
     x: int
     y: int
-    zone: Optional[Zone] = Field(default=Zone.NORMAL)
-    color: Optional[Color] = Field(default=Color.GRAY)
-    max_drones: Optional[int] = Field(default=1)
+    zone: Zone = Field(default=Zone.NORMAL)
+    color: Color = Field(default=Color.GRAY)
+    max_drones: int = Field(default=1)
+    connections: list['Connection'] = Field(default=[])
+
+    def __hash__(self) -> int:
+        """Get hash based on node name for use in sets and dicts.
+
+        Returns:
+            Hash value of the node's name.
+        """
+        return hash(self.name)
 
 
 class Start(Hub):
@@ -60,6 +68,8 @@ class Map:
         self.name = Path(name).stem.replace('_', ' ')
         self.nb_drones: int | None = None
         self.hubs: list[Hub] = []
+        self.start: Start | None = None
+        self.end: End | None = None
         self.connections: list[Connection] = []
 
     def coordinate_translation(self) -> None:
