@@ -3,7 +3,7 @@ ARG ?=
 run: install
 	uv run -m src $(ARG)
 
-install:
+install: map
 	uv sync
 
 debug:
@@ -21,5 +21,10 @@ lint:
 lint-strict:
 	flake8 src && mypy src --strict
 
-map:
+map: maps/.installed
+
+maps/.installed: maps.tar.gz
 	tar -xf maps.tar.gz
+	touch maps/.installed
+
+.PHONY: run install debug clean lint lint-strict map

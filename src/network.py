@@ -35,11 +35,6 @@ class Network:
         created_edge = Edge(connection, node1, node2)
         return created_edge
 
-    def next_step(self) -> None:
-        for node in self.nodes.get(self.step, []):
-            self.find_edge(node)
-        self.step += 1
-
     def find_edge(self, node: Node) -> None:
         for connection in node.real_hub.connections:
             node1 = self.create_node(connection.start, node.time + 1)
@@ -51,3 +46,8 @@ class Network:
                 new_edge = self.create_edge(connection, node2, node1)
             node1.edges.append(new_edge)
             node2.edges.append(new_edge)
+
+    def next_step(self) -> None:
+        for node in self.nodes.get(self.step, []):
+            self.find_edge(node)
+        self.step += 1

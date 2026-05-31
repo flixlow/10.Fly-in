@@ -66,7 +66,7 @@ class Connection(BaseModel):
 class Map:
     def __init__(self, name: str) -> None:
         self.name = Path(name).stem.replace('_', ' ')
-        self.nb_drones: int | None = None
+        self.nb_drones: int = 0
         self.hubs: list[Hub] = []
         self.start: Start | None = None
         self.end: End | None = None

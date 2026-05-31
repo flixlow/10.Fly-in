@@ -63,6 +63,8 @@ class Parser:
             raise MapError("Unknown line type.")
 
     def create_hub(self, line: str, hub: type) -> None:
+        if self.first_line is False:
+            raise ValueError("First line must begin with 'nb_drones'.")
         tab = self.hub_pattern.fullmatch(line)
         if not tab:
             format = "<start_hub|hub|end_hub>: <name> <x> <y> [metadata]"
@@ -91,6 +93,8 @@ class Parser:
         self.map.hubs.append(new)
 
     def create_connection(self, line: str) -> None:
+        if self.first_line is False:
+            raise ValueError("First line must begin with 'nb_drones'.")
         tab = self.connection_pattern.fullmatch(line)
         if not tab:
             format = "connection: <name1>-<name2> [metadata]"

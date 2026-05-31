@@ -98,10 +98,17 @@ degradé de fond vibe codé
 
     #         pygame.draw.line(self.screen, (r, g, b), (0, y), (self.width, y))
 
-    [ ] probleme affichage sur maze nightmare
-    [ ] est ce que le make import c est une bonne idee ?
+    [x] probleme affichage sur maze nightmare
+    [x] est ce que le make import c est une bonne idee ?
     [ ] self.map.coordinate_translation() shoulds i use this
 algo:
     [ ] lire doc dict.setdefault 
-
+    [ ] parcourir le graphe et chercher jusqu'a la sortie
+    [ ]enregistrer le passage par les hubs et les hubs visité en venant d'un point
+    [ ] si jamais on atteint la sortie, calcul du max flow pour ce trajet
+    [ ] on continue tant que l addition des maxflows n'est pas superieure ou egale
+    [ ] au nombre de drones
+    [ ] si jamais on appelle trois fois create_hub sans acceder
+    [ ] a des real hubs nouveaux, on arrete l'algo
+    [ ] gerer les restricted
 
