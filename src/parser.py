@@ -106,7 +106,8 @@ class Parser:
                 start_hub = hub
             elif end == hub.name:
                 end_hub = hub
-        connection: dict[str, Any] = {"start": start_hub, "end": end_hub}
+        connection: dict[str, Any] = {"name": f"{start}-{end}",
+                                      "start": start_hub, "end": end_hub}
         if metadata:
             metadata = int(metadata)
             if metadata == 0:

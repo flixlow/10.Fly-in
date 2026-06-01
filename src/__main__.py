@@ -1,7 +1,8 @@
 import os
 import questionary  # type: ignore
 from argparse import ArgumentParser
-from src.network import Network
+from src.network import Network, Edge, Node
+from src.algo import DFS
 from src.parser import Parser
 
 
@@ -35,7 +36,17 @@ def main() -> None:
     file_parser = Parser(file)
     map = file_parser.validate()
     network = Network(map)
-    network.next_step()
+    algo = DFS(network)
+    while not network.end_reached:
+        network.next_step()
+    print(len(network.start.edges))
+    path = algo.find_one_path(network.start, [network.start], [])
+    for e in path:
+        if isinstance(e, Node):
+            print(e.real_hub.name)
+        if isinstance(e, Edge):
+            print(e.real_connection.name if e.real_connection else f"connect {e.node1.real_hub.name}")
+
     displayer = Displayer(map)
     displayer.display()
 
@@ -45,6 +56,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
+        raise e
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
         print("\033[1;32m[END OF THE PROGRAM]\033[0m")

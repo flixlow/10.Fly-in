@@ -102,9 +102,9 @@ degradé de fond vibe codé
     [x] est ce que le make import c est une bonne idee ?
     [ ] self.map.coordinate_translation() shoulds i use this
 algo:
-    [ ] lire doc dict.setdefault 
+    [ ] lire doc dict.setdefault
     [ ] parcourir le graphe et chercher jusqu'a la sortie
-    [ ]enregistrer le passage par les hubs et les hubs visité en venant d'un point
+    [ ] enregistrer le passage par les hubs et les hubs visité en venant d'un point
     [ ] si jamais on atteint la sortie, calcul du max flow pour ce trajet
     [ ] on continue tant que l addition des maxflows n'est pas superieure ou egale
     [ ] au nombre de drones

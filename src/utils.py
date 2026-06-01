@@ -58,9 +58,10 @@ class End(Hub):
 
 
 class Connection(BaseModel):
+    name: str
     start: Hub
     end: Hub
-    max_link_capacity: int | None = Field(default=None)
+    max_link_capacity: int = Field(default=1)
 
 
 class Map:
