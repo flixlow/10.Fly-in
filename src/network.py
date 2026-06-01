@@ -59,10 +59,12 @@ class Network:
                 new_edge = self.create_edge(connection, node, node2)
                 node2.edges.append(new_edge)
                 same_edge = self.create_edge(None, node, node1)
+                node1.edges.append(same_edge)
             else:
                 new_edge = self.create_edge(connection, node, node1)
-                same_edge = self.create_edge(None, node, node2)
                 node1.edges.append(new_edge)
+                same_edge = self.create_edge(None, node, node2)
+                node2.edges.append(same_edge)
 
             node.edges.append(new_edge)
             node.edges.append(same_edge)

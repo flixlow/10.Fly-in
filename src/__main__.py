@@ -39,14 +39,10 @@ def main() -> None:
     algo = DFS(network)
     while not network.end_reached:
         network.next_step()
-    print(len(network.start.edges))
-    path = algo.find_one_path(network.start, [network.start], [])
-    for e in path:
-        if isinstance(e, Node):
-            print(e.real_hub.name)
-        if isinstance(e, Edge):
-            print(e.real_connection.name if e.real_connection else f"connect {e.node1.real_hub.name}")
-
+    while algo.max_flow < map.nb_drones:
+        print("ok")
+        network.next_step()
+        print(algo.get_max_flow())
     displayer = Displayer(map)
     displayer.display()
 

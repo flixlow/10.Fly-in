@@ -7,57 +7,52 @@ class DFS:
         self.max_flow: int = 0
         self.paths: list = []
 
-    def find_one_path(self, starting_node: Node,
+    def add_passage(self, path: list[Node | Edge], flow: int) -> None:
+        for item in path:
+            item.passage += flow
+
+    def get_max_flow(self) -> int:
+        flow: int = self.max_flow
+        while path := self.find_one_path(self.network.start, [], []):
+            flow += (current_flow := self.get_blocking_flow(path))
+            self.add_passage(path, current_flow)
+            self.paths.append(path)
+
+        self.max_flow = flow
+        return flow
+
+    def get_blocking_flow(self, path: list[Node | Edge]) -> int:
+        return min(item.get_remaining_capacity() for item in path)
+
+    def find_one_path(self, node: Node,
                       path: list[Node | Edge],
                       visited: list[Node | Edge],):
-        for edge in starting_node.edges:
-            next_node = edge.node1 if starting_node != edge.node1 else edge.node2
-            if edge.get_remaining_capacity() <= 0 and edge not in visited:
+        for edge in node.edges:
+            next_node = edge.node1 if node != edge.node1 else edge.node2
+            if edge in visited or next_node in visited:
                 continue
-            elif next_node.get_remaining_capacity() <= 0\
-                    and next_node not in visited:
+            if edge.get_remaining_capacity() <= 0:
                 continue
-            elif next_node.time <= starting_node.time:
+            if next_node.get_remaining_capacity() <= 0:
+                continue
+            if next_node.time <= node.time:
                 continue
 
             path.append(edge)
             path.append(next_node)
+            visited.append(edge)
+            visited.append(next_node)
             if next_node.real_hub is self.network.map.end:
                 return path
-            path_len: int = len(path)
+
             new_path = self.find_one_path(next_node, path, visited)
 
             if new_path:
                 return new_path
             else:
-                visited.append(edge)
-                visited.append(next_node)
-                del path[path_len:]
+                path.pop()
+                path.pop()
+                visited.remove(edge)
+                visited.remove(next_node)
 
         return None
-
-    # def finding(self) -> None:
-    #     attempts = 0
-    #     while self.max_flow > self.network.map.nb_drones:
-    #         path = self.find_one_path()
-    #         if path is None:
-    #             attempts += 1
-    #             if attempts >= 3:
-    #                 break
-    #         else:
-    #             attempts = 0
-    #             self.paths.append(path)
-    #             self.max_flow += self.calculate_flow(path)
-
-    # def calculate_flow(self, path: list[Node]) -> int:
-    #     flow: int = self.network.map.nb_drones
-
-    #     for current, next in zip(path, path[1:]):
-    #         for edge in current.edges:
-    #             if edge.node1 is next or edge.node2 is next:
-    #                 flow = min(flow, edge.real_connection.max_link_capacity)
-    #                 break
-
-    # flow = min(flow, current.real_hub.max_drones, next.real_hub.max_drones)
-
-    #     return flow
