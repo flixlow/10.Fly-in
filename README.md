@@ -102,19 +102,11 @@ degradé de fond vibe codé
     [x] est ce que le make import c est une bonne idee ?
     [ ] self.map.coordinate_translation() shoulds i use this
 algo:
-    [ ] lire doc dict.setdefault
-    [ ] changer dossier assets
+    [x] lire doc dict.setdefault
+    [x] changer dossier assets
+	[ ] mettre les hubs a la bonne taille
     [ ] readme a faire
     [ ] animation des drones
-    [ ] voir pour l
-    [ ] parcourir le graphe et chercher jusqu'a la sortie
-    [ ] enregistrer le passage par les hubs et les hubs visité en venant d'un point
-    [ ] si jamais on atteint la sortie, calcul du max flow pour ce trajet
-    [ ] on continue tant que l addition des maxflows n'est pas superieure ou egale
-    [ ] au nombre de drones
-    [ ] si jamais on appelle trois fois create_hub sans acceder
-    [ ] a des real hubs nouveaux, on arrete l'algo
+    [ ] si jamais on appelle trois fois create_hub sans acceder a des real hubs nouveaux, on arrete l'algo
     [ ] gerer les restricted
-    [ ] stocker les edges dans node.edges n’est pas indispensable pour la construction ?
-    [ ] comment je sais que le path qui vient d'etre trouver, n'a pas ete trouvé avant
-    
+    [ ] amelioration des performances sur les autres maps

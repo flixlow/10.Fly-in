@@ -1,20 +1,22 @@
 import pygame  # type: ignore
-from .utils import Map
+from .utils import Map, Hub
 from .algo import Edge, Node
 import json
 
 
 class Displayer:
-    def __init__(self, map: Map, paths: list[tuple[Edge, Node]]) -> None:
+    def __init__(self, map: Map,
+                 paths: list[list[tuple[Edge, Node]]]) -> None:
         self.map: Map = map
-        self.paths: list[tuple[Edge, Node]] = paths
-        self.time: int = 0
+        self.paths: list[list[tuple[Edge, Node]]] = paths
+        self.time: int = -1
         self.set_screen()
         self.set_padding(0.10)
         self.set_origin()
         self.set_max_coordinates()
         self.set_scales()
         self.set_colors()
+        self.set_drone_icon()
 
     def set_screen(self) -> None:
         pygame.init()
@@ -53,6 +55,10 @@ class Displayer:
         self.line_color: tuple[int, int, int] = self.themes[0]["line"]
         self.text_color: tuple[int, int, int] = self.themes[0]["text"]
 
+    def set_drone_icon(self) -> None:
+        drone_icon = pygame.image.load("assets/drone_icon.png").convert_alpha()
+        self.drone_icon = pygame.transform.scale(drone_icon, (12, 12))
+
     def change_theme(self) -> None:
         self.current_theme += 1
 
@@ -84,23 +90,31 @@ class Displayer:
             pygame.draw.circle(self.screen, color, (x, y), 15)
 
     def display_drones(self) -> None:
-        drone_icon = pygame.image.load("assets/drone_icon.png").convert_alpha()
         for path in self.paths:
-            if path[1] is None:
-                continue
-            node = path[1]
-            node.real_hub.
-            self.screen.blit(drone_icon, (x, y))
+            hub: Hub
+            if self.time >= (len(path) - 1):
+                _, node = path[len(path) - 1]
+                hub = node.real_hub
+            elif self.time == -1:
+                if self.map.start:
+                    hub = self.map.start
+            else:
+                _, node = path[self.time]
+                hub = node.real_hub
+            x = self.x_center + self.scale * hub.x
+            y = self.y_center + self.scale * hub.y
+            self.screen.blit(self.drone_icon, (x, y))
 
 
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",
                                 True, self.text_color)
-        self.screen.blit(text, (self.padding, self.padding))
+        self.screen.blit(text, (self.padding//2, self.padding//2))
 
     def display(self) -> None:
         clock = pygame.time.Clock()
         running = True
+        max_path_len = max([len(path) for path in self.paths])
         while running:
             self.screen.fill(self.back_color)
             for event in pygame.event.get():
@@ -111,10 +125,12 @@ class Displayer:
                         running = False
                     if event.key == pygame.K_SPACE:
                         self.change_theme()
-                    if event.key == pygame.K_LEFT:
-                        self.time += 1
                     if event.key == pygame.K_RIGHT:
-                        self.time -= 1
+                        if self.time < max_path_len:
+                            self.time += 1
+                    if event.key == pygame.K_LEFT:
+                        if self.time > -1:
+                            self.time -= 1
 
             self.display_connections()
             self.display_hubs()
