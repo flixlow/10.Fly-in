@@ -1,7 +1,7 @@
 import os
 import questionary  # type: ignore
 from argparse import ArgumentParser
-from src.network import Network, Edge, Node
+from src.network import Network
 from src.algo import DFS
 from src.parser import Parser
 
@@ -40,7 +40,6 @@ def main() -> None:
     while not network.end_reached:
         network.next_step()
     while algo.max_flow < map.nb_drones:
-        print("ok")
         network.next_step()
         print(algo.get_max_flow())
     displayer = Displayer(map)

@@ -40,11 +40,11 @@ class Displayer:
                                 usable_height / self.max_y)
 
     def set_colors(self) -> None:
-        with open("src/assets/themes.json", "r") as f:
+        with open("assets/themes.json", "r") as f:
             data = json.load(f)
         self.themes = data
         self.current_theme = 0
-        self.font = pygame.font.Font("src/assets/Tanker-Regular.otf", 60)
+        self.font = pygame.font.Font("assets/Tanker-Regular.otf", 60)
 
         self.back_color: tuple[int, int, int] = self.themes[0]["back"]
         self.line_color: tuple[int, int, int] = self.themes[0]["line"]

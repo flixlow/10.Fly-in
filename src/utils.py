@@ -63,6 +63,14 @@ class Connection(BaseModel):
     end: Hub
     max_link_capacity: int = Field(default=1)
 
+    def __hash__(self) -> int:
+        """Get hash based on node name for use in sets and dicts.
+
+        Returns:
+            Hash value of the node's name.
+        """
+        return hash(self.name)
+
 
 class Map:
     def __init__(self, name: str) -> None:

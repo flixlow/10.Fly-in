@@ -103,6 +103,10 @@ degradé de fond vibe codé
     [ ] self.map.coordinate_translation() shoulds i use this
 algo:
     [ ] lire doc dict.setdefault
+    [ ] changer dossier assets
+    [ ] readme a faire
+    [ ] animation des drones
+    [ ] voir pour l
     [ ] parcourir le graphe et chercher jusqu'a la sortie
     [ ] enregistrer le passage par les hubs et les hubs visité en venant d'un point
     [ ] si jamais on atteint la sortie, calcul du max flow pour ce trajet
@@ -111,4 +115,4 @@ algo:
     [ ] si jamais on appelle trois fois create_hub sans acceder
     [ ] a des real hubs nouveaux, on arrete l'algo
     [ ] gerer les restricted
-
+    [ ] stocker les edges dans node.edges n’est pas indispensable pour la construction ?

@@ -32,10 +32,10 @@ class Edge:
 class Network:
     def __init__(self, map: Map) -> None:
         self.map: Map = map
+        self.step: int = 0
+        self.end_reached: bool = False
         self.nodes: dict[int, list[Node]] = {}
         self.start: Node = self.create_node(self.map.start, 0)
-        self.step = 0
-        self.end_reached: bool = False
 
     @lru_cache(maxsize=None)
     def create_node(self, hub: Hub, time: int) -> Node:
@@ -45,6 +45,7 @@ class Network:
             self.end_reached = True
         return created_node
 
+    @lru_cache(maxsize=None)
     def create_edge(self, connection: Connection | None,
                     node1: Node, node2: Node) -> Edge:
         created_edge = Edge(connection, node1, node2)
@@ -57,17 +58,17 @@ class Network:
 
             if node1.real_hub is node.real_hub:
                 new_edge = self.create_edge(connection, node, node2)
-                node2.edges.append(new_edge)
-                same_edge = self.create_edge(None, node, node1)
-                node1.edges.append(same_edge)
+                static_edge = self.create_edge(None, node, node1)
+                # node2.edges.append(new_edge)
+                # node1.edges.append(same_edge)
             else:
                 new_edge = self.create_edge(connection, node, node1)
-                node1.edges.append(new_edge)
-                same_edge = self.create_edge(None, node, node2)
-                node2.edges.append(same_edge)
+                static_edge = self.create_edge(None, node, node2)
+                # node1.edges.append(new_edge)
+                # node2.edges.append(same_edge)
 
             node.edges.append(new_edge)
-            node.edges.append(same_edge)
+            node.edges.append(static_edge)
 
     def next_step(self) -> None:
         for node in self.nodes.get(self.step, []):
