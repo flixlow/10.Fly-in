@@ -13,7 +13,7 @@ class DFS:
 
     def get_max_flow(self) -> int:
         flow: int = self.max_flow
-        while path := self.find_one_path(self.network.start, [], []):
+        while path := self.find_one_path(self.network.start, [], set()):
             flow += (current_flow := self.get_blocking_flow(path))
             self.add_passage(path, current_flow)
             self.paths.append(path)
@@ -26,7 +26,7 @@ class DFS:
 
     def find_one_path(self, node: Node,
                       path: list[Node | Edge],
-                      visited: list[Node | Edge],):
+                      visited: set[Node | Edge]):
         for edge in node.edges:
             next_node = edge.node1 if node != edge.node1 else edge.node2
             if edge in visited or next_node in visited:
@@ -40,8 +40,8 @@ class DFS:
 
             path.append(edge)
             path.append(next_node)
-            visited.append(edge)
-            visited.append(next_node)
+            visited.add(edge)
+            visited.add(next_node)
             if next_node.real_hub is self.network.map.end:
                 return path
 
