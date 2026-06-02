@@ -23,8 +23,8 @@ lint-strict:
 
 map: maps/.installed
 
-maps/.installed: maps.tar.gz
-	tar -xf maps.tar.gz
+maps/.installed: data/maps.tar.gz
+	tar -xf data/maps.tar.gz
 	touch maps/.installed
 
 .PHONY: run install debug clean lint lint-strict map
