@@ -116,3 +116,5 @@ algo:
     [ ] a des real hubs nouveaux, on arrete l'algo
     [ ] gerer les restricted
     [ ] stocker les edges dans node.edges n’est pas indispensable pour la construction ?
+    [ ] comment je sais que le path qui vient d'etre trouver, n'a pas ete trouvé avant
+    

@@ -37,21 +37,29 @@ def main() -> None:
     map = file_parser.validate()
     network = Network(map)
     algo = DFS(network)
+
     while not network.end_reached:
         network.next_step()
+
     while algo.max_flow < map.nb_drones:
-        network.next_step()
         print(algo.get_max_flow())
-    displayer = Displayer(map)
+        network.next_step()
+
+    for path in algo.paths:
+        for _, node in path:
+            print(node.real_hub.name, node.time)
+        print("\n")
+
+    displayer = Displayer(map, algo.paths)
     displayer.display()
 
 
 if __name__ == "__main__":
-    print("\033[1;32m[START OF THE PROGRAM]\033[0m")
+    print("\033[1;32m[START]\033[0m")
     try:
         main()
     except Exception as e:
         raise e
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
-        print("\033[1;32m[END OF THE PROGRAM]\033[0m")
+        print("\033[1;32m[END]\033[0m")

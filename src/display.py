@@ -1,11 +1,14 @@
 import pygame  # type: ignore
 from .utils import Map
+from .algo import Edge, Node
 import json
 
 
 class Displayer:
-    def __init__(self, map: Map) -> None:
+    def __init__(self, map: Map, paths: list[tuple[Edge, Node]]) -> None:
         self.map: Map = map
+        self.paths: list[tuple[Edge, Node]] = paths
+        self.time: int = 0
         self.set_screen()
         self.set_padding(0.10)
         self.set_origin()
@@ -81,7 +84,14 @@ class Displayer:
             pygame.draw.circle(self.screen, color, (x, y), 15)
 
     def display_drones(self) -> None:
-        ...
+        drone_icon = pygame.image.load("assets/drone_icon.png").convert_alpha()
+        for path in self.paths:
+            if path[1] is None:
+                continue
+            node = path[1]
+            node.real_hub.
+            self.screen.blit(drone_icon, (x, y))
+
 
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",
@@ -101,6 +111,10 @@ class Displayer:
                         running = False
                     if event.key == pygame.K_SPACE:
                         self.change_theme()
+                    if event.key == pygame.K_LEFT:
+                        self.time += 1
+                    if event.key == pygame.K_RIGHT:
+                        self.time -= 1
 
             self.display_connections()
             self.display_hubs()

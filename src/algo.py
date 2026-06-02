@@ -7,9 +7,10 @@ class DFS:
         self.max_flow: int = 0
         self.paths: list = []
 
-    def add_passage(self, path: list[Node | Edge], flow: int) -> None:
-        for item in path:
-            item.passage += flow
+    def add_passage(self, path: list[tuple[Edge, Node]], flow: int) -> None:
+        for edge, node in path:
+            edge.passage += flow
+            node.passage += flow
 
     def get_max_flow(self) -> int:
         flow: int = self.max_flow
@@ -21,15 +22,17 @@ class DFS:
         self.max_flow = flow
         return flow
 
-    def get_blocking_flow(self, path: list[Node | Edge]) -> int:
-        return min(item.get_remaining_capacity() for item in path)
+    def get_blocking_flow(self, path: list[tuple[Edge, Node]]) -> int:
+        return min(min(
+            edge.get_remaining_capacity(),
+            node.get_remaining_capacity()
+        ) for node, edge in path)
 
-    def find_one_path(self, node: Node,
-                      path: list[Node | Edge],
-                      visited: set[Node | Edge]):
+    def find_one_path(self, node: Node, path: list[tuple[Edge, Node]],
+                      visited: set[Node | Edge]) -> None | list[tuple]:
         for edge in node.edges:
-            next_node = edge.node1 if node != edge.node1 else edge.node2
-            if edge in visited or next_node in visited:
+            next_node = edge.node2
+            if edge in visited:
                 continue
             if edge.get_remaining_capacity() <= 0:
                 continue
@@ -37,22 +40,14 @@ class DFS:
                 continue
             if next_node.time <= node.time:
                 continue
-
-            path.append(edge)
-            path.append(next_node)
+            path.append((edge, next_node))
             visited.add(edge)
-            visited.add(next_node)
             if next_node.real_hub is self.network.map.end:
                 return path
-
             new_path = self.find_one_path(next_node, path, visited)
-
             if new_path:
                 return new_path
             else:
                 path.pop()
-                path.pop()
                 visited.remove(edge)
-                visited.remove(next_node)
-
         return None
