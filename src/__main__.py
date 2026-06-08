@@ -28,6 +28,12 @@ def command_line() -> str:
     return current_path
 
 
+class Drone:
+    def __init__(self, id: int, path: list[tuple]) -> None:
+        self.id = id
+        self.path = path
+
+
 def main() -> None:
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
     from src.display import Displayer
@@ -44,6 +50,17 @@ def main() -> None:
     while algo.max_flow < map.nb_drones:
         algo.get_max_flow()
         network.next_step()
+
+    # print(algo.paths)
+    # drones: list[Drone] = []
+    # for path in algo.paths:
+    #     flow = algo.get_blocking_flow(path)
+    #     # print(flow)
+    #     for i in range(1, flow + 1):
+    #         drones.append(Drone(i, path))
+
+    # for drone in drones:
+    #     print(drone.id)
 
     displayer = Displayer(map, algo.paths)
     displayer.display()

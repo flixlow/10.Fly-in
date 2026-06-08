@@ -64,40 +64,7 @@ lgirard
 [x] Utiliser argparse
 [x] Verifier presence de end_hub et start_hub
 
-debug: 
-    # for hub in map.hubs:
-    #     if isinstance(hub, Start):
-    #         print("\033[1;36m[START HUB]\033[0m:", hub)
-    #     elif isinstance(hub, End):
-    #         print("\033[1;36m[END HUB]\033[0m:", hub)
-    #     else:
-    #         print("\033[1;34m[HUB]\033[0m:", hub)
-    # for con in map.connections:
-    #     print("\033[1;35m[CONNECTION]\033[0m:", con.start.name, end=" ")
-    #     print(con.end.name, con.max_link_capacity)
-
-displayer:
-degradé de fond vibe codé
-    # def shade(self, factor: float) -> tuple[int, int, int]:
-    #     color = self.back_color
-    #     return (
-    #         max(0, min(int(color[0] * factor), 255)),
-    #         max(0, min(int(color[1] * factor), 255)),
-    #         max(0, min(int(color[2] * factor), 255))
-    #     )
-
-    # def draw_gradient(self) -> None:
-    #     bottom = self.shade(0.4)
-    #     top = self.shade(1.5)
-    #     for y in range(round(self.height)):
-    #         ratio = y / self.height
-
-    #         r = top[0] * (1 - ratio) + bottom[0] * ratio
-    #         g = top[1] * (1 - ratio) + bottom[1] * ratio
-    #         b = top[2] * (1 - ratio) + bottom[2] * ratio
-
-    #         pygame.draw.line(self.screen, (r, g, b), (0, y), (self.width, y))
-
+debug:
     [x] probleme affichage sur maze nightmare
     [x] est ce que le make import c est une bonne idee ?
     [ ] self.map.coordinate_translation() shoulds i use this
@@ -108,7 +75,7 @@ algo:
     [ ] readme a faire
     [ ] animation des drones
     [ ] arreter algo, si next ne donne pas de nouveau hub apres trois appels
-    [ ] gerer les restricted
+    [ ] gerer les restricted, priority
     [ ] amelioration des performances sur les autres maps
     [ ] adapter pour voir le nombre de drones par hub
     [x] dans set_colors, securiser la présence des themes

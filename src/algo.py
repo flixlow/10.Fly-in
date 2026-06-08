@@ -14,8 +14,10 @@ class DFS:
 
     def get_max_flow(self) -> int:
         flow: int = self.max_flow
-        while path := self.find_one_path(self.network.start, [], set()):
-            flow += (current_flow := self.get_blocking_flow(path))
+        while path := self.find_one_path(self.network.start,
+                                         [], set(), set(), set()):
+            current_flow = self.get_blocking_flow(path)
+            flow += current_flow
             self.add_passage(path, current_flow)
             self.paths.append(path)
 
@@ -28,26 +30,43 @@ class DFS:
             node.get_remaining_capacity()
         ) for edge, node in path)
 
-    def find_one_path(self, node: Node, path: list[tuple[Edge, Node]],
-                      visited: set[Node | Edge]) -> None | list[tuple]:
-        for edge in node.edges:
+    def find_one_path(self, node: Node,
+                      path: list[tuple[Edge, Node]],
+                      visited_nodes: set[Node],
+                      visited_edges: set[Edge],
+                      dead_ends: set[Node]
+                      ) -> None | list[tuple]:
+        if node in dead_ends:
+            return None
+
+        for edge in node.edges:  # sort by priority
             next_node = edge.node2
-            if edge in visited:
-                continue
-            if edge.get_remaining_capacity() <= 0:
-                continue
-            if next_node.get_remaining_capacity() <= 0:
-                continue
+
             if next_node.time <= node.time:
                 continue
+
+            if edge.get_remaining_capacity() <= 0:
+                continue
+
+            if edge in visited_edges:
+                continue
+
+            if next_node.get_remaining_capacity() <= 0:
+                continue
+
+            visited_nodes.add(node)
+            visited_edges.add(edge)
             path.append((edge, next_node))
-            visited.add(edge)
+
             if next_node.real_hub is self.network.map.end:
                 return path
-            new_path = self.find_one_path(next_node, path, visited)
+            new_path = self.find_one_path(next_node, path, visited_nodes,
+                                          visited_edges, dead_ends)
             if new_path:
                 return new_path
             else:
                 path.pop()
-                visited.remove(edge)
+                visited_edges.remove(edge)
+                visited_nodes.remove(node)
+        dead_ends.add(node)
         return None
