@@ -20,6 +20,7 @@ class Displayer:
 
     def set_screen(self) -> None:
         pygame.init()
+        pygame.display.set_caption("")
 
         self.width = pygame.display.Info().current_w * (3/4)
         self.height = pygame.display.Info().current_h * (3/4)
@@ -89,22 +90,21 @@ class Displayer:
             pygame.draw.circle(self.screen, self.line_color, (x, y), 20)
             pygame.draw.circle(self.screen, color, (x, y), 15)
 
+    def get_hub(self, path):
+        if self.time == -1:
+            return self.map.start
+
+        if self.time >= len(path):
+            return path[-1][1].real_hub
+
+        return path[self.time][1].real_hub
+
     def display_drones(self) -> None:
         for path in self.paths:
-            hub: Hub
-            if self.time >= (len(path) - 1):
-                _, node = path[len(path) - 1]
-                hub = node.real_hub
-            elif self.time == -1:
-                if self.map.start:
-                    hub = self.map.start
-            else:
-                _, node = path[self.time]
-                hub = node.real_hub
+            hub = self.get_hub(path)
             x = self.x_center + self.scale * hub.x
             y = self.y_center + self.scale * hub.y
             self.screen.blit(self.drone_icon, (x, y))
-
 
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",

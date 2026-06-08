@@ -42,13 +42,8 @@ def main() -> None:
         network.next_step()
 
     while algo.max_flow < map.nb_drones:
-        print(algo.get_max_flow())
+        algo.get_max_flow()
         network.next_step()
-
-    for path in algo.paths:
-        for _, node in path:
-            print(node.real_hub.name, node.time)
-        print("\n")
 
     displayer = Displayer(map, algo.paths)
     displayer.display()
