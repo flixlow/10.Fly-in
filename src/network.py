@@ -89,5 +89,13 @@ class Network:
         self.step += 1
 
     # def is_in_loop(self) -> bool:
-    #     pass
-        # for k, v in self.nodes:
+    #     if self.nodes is not None and self.step >= 2:
+    #         pool = {
+    #             node.real_hub for node in self.nodes.get(self.step - 1, [])}
+    #         pool.update(
+    #             node.real_hub for node in self.nodes.get(self.step - 2, []))
+    #         if set(
+    #             hub.real_hub for hub in self.nodes.get(self.step, [])
+    #         ) in pool:
+    #             return False
+    #     return True

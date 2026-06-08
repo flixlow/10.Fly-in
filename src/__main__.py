@@ -51,16 +51,6 @@ def main() -> None:
         algo.get_max_flow()
         network.next_step()
 
-    # print(algo.paths)
-    # drones: list[Drone] = []
-    # for path in algo.paths:
-    #     flow = algo.get_blocking_flow(path)
-    #     for i in range(1, flow + 1):
-    #         drones.append(Drone(i, path))
-
-    # for drone in drones:
-    #     print(drone.id)
-
     displayer = Displayer(map, algo.paths)
     displayer.display()
 
