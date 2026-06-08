@@ -33,6 +33,9 @@ class Network:
     def __init__(self, map: Map) -> None:
         self.map: Map = map
         self.step: int = 0
+        self.created: set[Hub] = set()
+        self.counter: int = 0
+        self.is_running: bool = True
         self.end_reached: bool = False
         self.nodes: dict[int, list[Node]] = {}
         self.start: Node = self.create_node(self.map.start, 0)
@@ -51,6 +54,17 @@ class Network:
         created_edge = Edge(connection, node1, node2)
         return created_edge
 
+    # def is_new_hub(self, hub1: Hub, hub2: Hub) -> bool:
+    #     if hub1 or hub2 in self.created:
+    #         self.counter += 1
+    #         if self.counter == 3:
+    #             self.is_running = False
+    #     else:
+    #         self.counter = 0
+    #         self.created.add(hub1)
+    #         self.created.add(hub2)
+    #     return self.is_running
+
     def find_edge(self, node: Node) -> None:
         for connection in node.real_hub.connections:
             node1 = self.create_node(connection.start, node.time + 1)
@@ -59,13 +73,9 @@ class Network:
             if node1.real_hub is node.real_hub:
                 new_edge = self.create_edge(connection, node, node2)
                 static_edge = self.create_edge(None, node, node1)
-                # node2.edges.append(new_edge)
-                # node1.edges.append(same_edge)
             else:
                 new_edge = self.create_edge(connection, node, node1)
                 static_edge = self.create_edge(None, node, node2)
-                # node1.edges.append(new_edge)
-                # node2.edges.append(same_edge)
 
             node.edges.append(new_edge)
             node.edges.append(static_edge)
@@ -73,4 +83,11 @@ class Network:
     def next_step(self) -> None:
         for node in self.nodes.get(self.step, []):
             self.find_edge(node)
+        for node in self.nodes.get(self.step, []):
+            if node.real_hub not in self.created:
+                self.counter = 0
+                self.created.add(node.real_hub)
+        self.counter += 1
+        if self.counter >= 4:
+            self.is_running = False
         self.step += 1

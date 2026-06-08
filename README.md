@@ -104,9 +104,12 @@ degradé de fond vibe codé
 algo:
     [x] lire doc dict.setdefault
     [x] changer dossier assets
-	[ ] mettre les hubs a la bonne taille
+	[x] mettre les hubs a la bonne taille
     [ ] readme a faire
     [ ] animation des drones
-    [ ] si jamais on appelle trois fois create_hub sans acceder a des real hubs nouveaux, on arrete l'algo
+    [ ] arreter algo, si next ne donne pas de nouveau hub apres trois appels
     [ ] gerer les restricted
     [ ] amelioration des performances sur les autres maps
+    [ ] adapter pour voir le nombre de drones par hub
+    [x] dans set_colors, securiser la présence des themes
+    [ ] output file

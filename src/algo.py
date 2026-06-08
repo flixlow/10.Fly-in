@@ -26,7 +26,7 @@ class DFS:
         return min(min(
             edge.get_remaining_capacity(),
             node.get_remaining_capacity()
-        ) for node, edge in path)
+        ) for edge, node in path)
 
     def find_one_path(self, node: Node, path: list[tuple[Edge, Node]],
                       visited: set[Node | Edge]) -> None | list[tuple]:

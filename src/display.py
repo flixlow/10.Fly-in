@@ -1,6 +1,6 @@
 import pygame  # type: ignore
-from .utils import Map, Hub
 from .algo import Edge, Node
+from .utils import Map, Hub
 import json
 
 
@@ -11,12 +11,18 @@ class Displayer:
         self.paths: list[list[tuple[Edge, Node]]] = paths
         self.time: int = -1
         self.set_screen()
-        self.set_padding(0.10)
+        self.set_padding(0.15)
         self.set_origin()
         self.set_max_coordinates()
         self.set_scales()
         self.set_colors()
+        self.set_size()
         self.set_drone_icon()
+
+    def set_size(self) -> None:
+        self.line_width = max(1, int(self.scale * 0.075))
+        self.outside_hub = max(1, int(self.scale * 0.075))
+        self.inside_hub = self.outside_hub - self.outside_hub // 3
 
     def set_screen(self) -> None:
         pygame.init()
@@ -46,11 +52,17 @@ class Displayer:
                                 usable_height / self.max_y)
 
     def set_colors(self) -> None:
-        with open("assets/themes.json", "r") as f:
-            data = json.load(f)
+        try:
+            with open("assets/themes.json", "r") as f:
+                data = json.load(f)
+        except Exception:
+            data = [{"back": [236, 239, 244],
+                     "line": [94, 129, 172],
+                     "text": [46, 52, 64]}]
         self.themes = data
         self.current_theme = 0
-        self.font = pygame.font.Font("assets/Tanker-Regular.otf", 60)
+        font_size = max(10, int(self.height * 0.05))
+        self.font = pygame.font.Font("assets/Tanker-Regular.otf", font_size)
 
         self.back_color: tuple[int, int, int] = self.themes[0]["back"]
         self.line_color: tuple[int, int, int] = self.themes[0]["line"]
@@ -58,7 +70,10 @@ class Displayer:
 
     def set_drone_icon(self) -> None:
         drone_icon = pygame.image.load("assets/drone_icon.png").convert_alpha()
-        self.drone_icon = pygame.transform.scale(drone_icon, (12, 12))
+        icon_size = max(12, min(int(self.scale * 0.15), 120))
+        size_tuple = (icon_size, icon_size)
+        self.drone_icon = pygame.transform.scale(drone_icon, size_tuple)
+        self.drone_icon_half = icon_size // 2
 
     def change_theme(self) -> None:
         self.current_theme += 1
@@ -79,7 +94,7 @@ class Displayer:
             end_hub = ((self.x_center + self.scale * con.end.x),
                        (self.y_center + self.scale * con.end.y))
             pygame.draw.line(self.screen, self.line_color,
-                             start_hub, end_hub, 5)
+                             start_hub, end_hub, self.line_width)
 
     def display_hubs(self) -> None:
         for hub in self.map.hubs:
@@ -87,12 +102,14 @@ class Displayer:
             y = self.y_center + self.scale * hub.y
             if hub.color is not None:
                 color = hub.color.value
-            pygame.draw.circle(self.screen, self.line_color, (x, y), 20)
-            pygame.draw.circle(self.screen, color, (x, y), 15)
+            pygame.draw.circle(self.screen, self.line_color,
+                               (x, y), self.outside_hub)
+            pygame.draw.circle(self.screen, color, (x, y), self.inside_hub)
 
-    def get_hub(self, path):
+    def get_hub(self, path: list[tuple[Edge, Node]]) -> Hub:
         if self.time == -1:
-            return self.map.start
+            if self.map.start:
+                return self.map.start
 
         if self.time >= len(path):
             return path[-1][1].real_hub
@@ -104,12 +121,14 @@ class Displayer:
             hub = self.get_hub(path)
             x = self.x_center + self.scale * hub.x
             y = self.y_center + self.scale * hub.y
-            self.screen.blit(self.drone_icon, (x, y))
+            hx = x - self.drone_icon_half
+            hy = y - self.drone_icon_half
+            self.screen.blit(self.drone_icon, (hx, hy))
 
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",
                                 True, self.text_color)
-        self.screen.blit(text, (self.padding//2, self.padding//2))
+        self.screen.blit(text, (int(self.padding//2), int(self.padding//2)))
 
     def display(self) -> None:
         clock = pygame.time.Clock()
@@ -134,8 +153,8 @@ class Displayer:
 
             self.display_connections()
             self.display_hubs()
-            self.display_drones()
             self.display_text()
+            self.display_drones()
 
             pygame.display.flip()
             clock.tick(60)
