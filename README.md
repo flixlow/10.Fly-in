@@ -73,10 +73,26 @@ algo:
     [x] changer dossier assets
 	[x] mettre les hubs a la bonne taille
     [ ] readme a faire
-    [ ] animation des drones
+    [x] animation des drones
     [ ] arreter algo, si next ne donne pas de nouveau hub apres trois appels
     [ ] gerer les restricted, priority
-    [ ] amelioration des performances sur les autres maps
+    [x] amelioration des performances sur les autres maps
     [ ] adapter pour voir le nombre de drones par hub
     [x] dans set_colors, securiser la présence des themes
     [ ] output file
+    [ ]
+
+    # def coordinate_translation(self) -> None:
+    #     for hub in self.hubs:
+    #         print(hub.name, hub.x, hub.y)
+    #     min_x = min([hub.x for hub in self.hubs])
+    #     min_y = min([hub.y for hub in self.hubs])
+    #     if min_x < 0:
+    #         for hub in self.hubs:
+    #             hub.x = hub.x - min_x
+    #     if min_y < 0:
+    #         for hub in self.hubs:
+    #             hub.y = hub.y - min_y
+    #     print()
+    #     for hub in self.hubs:
+    #         print(hub.name, hub.x, hub.y)

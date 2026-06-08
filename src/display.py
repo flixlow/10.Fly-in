@@ -11,7 +11,7 @@ class Displayer:
         self.paths: list[list[tuple[Edge, Node]]] = paths
         self.time: int = -1
         self.set_screen()
-        self.set_padding(0.15)
+        self.set_padding(0.05)
         self.set_origin()
         self.set_max_coordinates()
         self.set_scales()
@@ -20,8 +20,8 @@ class Displayer:
         self.set_drone_icon()
 
     def set_size(self) -> None:
-        self.line_width = max(1, int(self.scale * 0.075))
-        self.outside_hub = max(1, int(self.scale * 0.075))
+        self.line_width = max(1, int(self.scale * 0.05))
+        self.outside_hub = max(1, int(self.scale * 0.08))
         self.inside_hub = self.outside_hub - self.outside_hub // 3
 
     def set_screen(self) -> None:
@@ -42,8 +42,8 @@ class Displayer:
         self.y_center: float = self.height / 2
 
     def set_max_coordinates(self) -> None:
-        self.max_x: int = max(1, max([hub.x for hub in self.map.hubs]))
-        self.max_y: int = max(1, max([hub.y for hub in self.map.hubs]))
+        self.max_x: int = max(2, max([hub.x for hub in self.map.hubs]))
+        self.max_y: int = max(2, max([hub.y for hub in self.map.hubs]))
 
     def set_scales(self) -> None:
         usable_width = self.width - (self.padding * 2)

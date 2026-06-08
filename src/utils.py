@@ -80,13 +80,3 @@ class Map:
         self.start: Start | None = None
         self.end: End | None = None
         self.connections: list[Connection] = []
-
-    def coordinate_translation(self) -> None:
-        min_x = min([hub.x for hub in self.hubs])
-        min_y = min([hub.y for hub in self.hubs])
-        if min_x < 0:
-            for hub in self.hubs:
-                hub.x = hub.x - min_x
-        if min_y < 0:
-            for hub in self.hubs:
-                hub.y = hub.y - min_y
