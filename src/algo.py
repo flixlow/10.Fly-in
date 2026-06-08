@@ -1,4 +1,5 @@
 from src.network import Network, Node, Edge
+from src.utils import Zone
 
 
 class DFS:
@@ -30,27 +31,24 @@ class DFS:
             node.get_remaining_capacity()
         ) for edge, node in path)
 
-    def find_one_path(self, node: Node,
-                      path: list[tuple[Edge, Node]],
-                      visited_nodes: set[Node],
-                      visited_edges: set[Edge],
-                      dead_ends: set[Node]
-                      ) -> None | list[tuple]:
+    def find_one_path(self, node: Node, path: list[tuple[Edge, Node]],
+                      visited_nodes: set[Node], visited_edges: set[Edge],
+                      dead_ends: set[Node]) -> None | list[tuple]:
         if node in dead_ends:
             return None
 
-        for edge in node.edges:  # sort by priority
+        for edge in node.edges:
             next_node = edge.node2
 
+            if next_node.real_hub.zone == Zone.BLOCKED:
+                dead_ends.add(next_node)
+                continue
             if next_node.time <= node.time:
                 continue
-
             if edge.get_remaining_capacity() <= 0:
                 continue
-
             if edge in visited_edges:
                 continue
-
             if next_node.get_remaining_capacity() <= 0:
                 continue
 
@@ -60,13 +58,17 @@ class DFS:
 
             if next_node.real_hub is self.network.map.end:
                 return path
+
             new_path = self.find_one_path(next_node, path, visited_nodes,
                                           visited_edges, dead_ends)
+
             if new_path:
                 return new_path
+
             else:
                 path.pop()
                 visited_edges.remove(edge)
                 visited_nodes.remove(node)
+
         dead_ends.add(node)
         return None

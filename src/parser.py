@@ -30,6 +30,8 @@ class Parser:
             raise PermissionError(f"File: {file} permission denied.")
         except IsADirectoryError:
             raise IsADirectoryError(f"{file} is a directory.")
+        except OSError:
+            raise OSError(f"{file}")
 
     def validate(self) -> Map:
         for i, line in enumerate(self.lines, start=1):

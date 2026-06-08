@@ -75,7 +75,9 @@ algo:
     [ ] readme a faire
     [x] animation des drones
     [ ] arreter algo, si next ne donne pas de nouveau hub apres trois appels
-    [ ] gerer les restricted, priority
+    [ ] priority
+    [ ] priority
+    [ ] priority
     [x] amelioration des performances sur les autres maps
     [ ] adapter pour voir le nombre de drones par hub
     [x] dans set_colors, securiser la présence des themes
@@ -96,3 +98,4 @@ algo:
     #     print()
     #     for hub in self.hubs:
     #         print(hub.name, hub.x, hub.y)
+end 

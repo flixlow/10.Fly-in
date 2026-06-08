@@ -55,7 +55,6 @@ def main() -> None:
     # drones: list[Drone] = []
     # for path in algo.paths:
     #     flow = algo.get_blocking_flow(path)
-    #     # print(flow)
     #     for i in range(1, flow + 1):
     #         drones.append(Drone(i, path))
 

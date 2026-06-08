@@ -1,4 +1,4 @@
-from src.utils import Map, Hub, Connection
+from src.utils import Map, Hub, Connection, Zone
 from functools import lru_cache
 
 
@@ -11,6 +11,21 @@ class Node:
 
     def get_remaining_capacity(self) -> int:
         return self.real_hub.max_drones - self.passage
+
+    @staticmethod
+    def is_priority_zone(edge) -> bool:
+        if edge.real_connection is None:
+            return False
+        hub = edge.real_connection.end
+        return hub.zone == Zone.PRIORITY
+
+    def sort_edges(self) -> None:
+        self.edges.sort(key=Node.is_priority_zone, reverse=True)
+        # self.edges = [
+        #     edge for edge in self.edges
+        #     if edge.real_connection is not None and
+        #     edge.real_connection.end.zone is not Zone.BLOCKED
+        # ]
 
 
 class Edge:
@@ -33,9 +48,7 @@ class Network:
     def __init__(self, map: Map) -> None:
         self.map: Map = map
         self.step: int = 0
-        # self.created: set[Hub] = set()
         # self.counter: int = 0
-        # self.is_running: bool = True
         self.end_reached: bool = False
         self.nodes: dict[int, list[Node]] = {}
         self.start: Node = self.create_node(self.map.start, 0)
@@ -68,15 +81,13 @@ class Network:
 
             node.edges.append(new_edge)
             node.edges.append(static_edge)
+        node.sort_edges()
 
     def next_step(self) -> None:
         for node in self.nodes.get(self.step, []):
             self.find_edge(node)
-        # for node in self.nodes.get(self.step, []):
-        #     if node.real_hub not in self.created:
-        #         self.counter = 0
-        #         self.created.add(node.real_hub)
-        # self.counter += 1
-        # if self.counter >= 4:
-        #     self.is_running = False
         self.step += 1
+
+    # def is_in_loop(self) -> bool:
+    #     pass
+        # for k, v in self.nodes:

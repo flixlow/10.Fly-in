@@ -21,7 +21,7 @@ class Displayer:
 
     def set_size(self) -> None:
         self.line_width = max(1, int(self.scale * 0.05))
-        self.outside_hub = max(1, int(self.scale * 0.08))
+        self.outside_hub = max(1, int(self.scale * 0.1))
         self.inside_hub = self.outside_hub - self.outside_hub // 3
 
     def set_screen(self) -> None:
@@ -70,7 +70,7 @@ class Displayer:
 
     def set_drone_icon(self) -> None:
         drone_icon = pygame.image.load("assets/drone_icon.png").convert_alpha()
-        icon_size = max(12, min(int(self.scale * 0.15), 120))
+        icon_size = max(12, min(int(self.scale * 0.3), 120))
         size_tuple = (icon_size, icon_size)
         self.drone_icon = pygame.transform.scale(drone_icon, size_tuple)
         self.drone_icon_half = icon_size // 2
