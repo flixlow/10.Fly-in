@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from src.parser import Parser
 from src.network import Network
 from src.algo import DFS
-from src.output import output_format
+from src.output import Output
 
 
 def command_line() -> str:
@@ -46,7 +46,8 @@ def main() -> None:
         algo.get_max_flow()
         network.next_step()
 
-    output_format(map, algo)
+    output = Output(map, algo)
+    output.print_output()
 
     displayer = Displayer(map, algo.paths)
     displayer.display()

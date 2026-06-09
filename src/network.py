@@ -26,10 +26,6 @@ class Node:
         self.edges.sort(key=Node.is_priority_zone, reverse=True)
 
 
-class ConnectionNode(Node):
-    pass
-
-
 class Edge:
     def __init__(self, connection: Connection | None,
                  node1: Node, node2: Node) -> None:
@@ -44,6 +40,10 @@ class Edge:
 
     def get_remaining_capacity(self) -> int:
         return self.max_link_capacity - self.passage
+
+
+class ConnectionNode(Node):
+    pass
 
 
 class Network:
@@ -99,16 +99,3 @@ class Network:
             else:
                 self.find_edge(node)
         self.step += 1
-
-    # if node1.real_hub.zone is Zone.RESTRICTED:
-    # def is_in_loop(self) -> bool:
-    #     if self.nodes is not None and self.step >= 2:
-    #         pool = {
-    #             node.real_hub for node in self.nodes.get(self.step - 1, [])}
-    #         pool.update(
-    #             node.real_hub for node in self.nodes.get(self.step - 2, []))
-    #         if set(
-    #             hub.real_hub for hub in self.nodes.get(self.step, [])
-    #         ) in pool:
-    #             return False
-    #     return True

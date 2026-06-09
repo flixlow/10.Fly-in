@@ -80,8 +80,8 @@ algo:
 [x] output file
 [x] adapter pour voir le nombre de drones par hub
 [x] restricted
+[x] output file for restricted zone
 [ ] arreter algo, si next ne donne pas de nouveau hub apres trois
-[ ] output file for restricted zone
 [ ] readme a faire
 
 hubs: list[dict[hubs.name, n_drones]]

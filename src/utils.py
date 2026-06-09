@@ -3,6 +3,12 @@ from pathlib import Path
 from enum import Enum
 
 
+class Drone:
+    def __init__(self, id: int, path: list[tuple]) -> None:
+        self.id = id
+        self.path = path
+
+
 class Color(Enum):
     RED = "red"
     GREEN = "green"
