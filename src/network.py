@@ -9,6 +9,9 @@ class Node:
         self.edges: list[Edge] = []
         self.passage: int = 0
 
+    def set_previous_connection(self, connection: Connection) -> None:
+        self.previous_connection: Connection = connection
+
     def get_remaining_capacity(self) -> int:
         return self.real_hub.max_drones - self.passage
 
@@ -21,11 +24,10 @@ class Node:
 
     def sort_edges(self) -> None:
         self.edges.sort(key=Node.is_priority_zone, reverse=True)
-        # self.edges = [
-        #     edge for edge in self.edges
-        #     if edge.real_connection is not None and
-        #     edge.real_connection.end.zone is not Zone.BLOCKED
-        # ]
+
+
+class ConnectionNode(Node):
+    pass
 
 
 class Edge:
@@ -48,14 +50,13 @@ class Network:
     def __init__(self, map: Map) -> None:
         self.map: Map = map
         self.step: int = 0
-        # self.counter: int = 0
         self.end_reached: bool = False
         self.nodes: dict[int, list[Node]] = {}
         self.start: Node = self.create_node(self.map.start, 0)
 
     @lru_cache(maxsize=None)
-    def create_node(self, hub: Hub, time: int) -> Node:
-        created_node: Node = Node(hub, time)
+    def create_node(self, hub: Hub, time: int, node_type: type = Node) -> Node:
+        created_node: Node = node_type(hub, time)
         self.nodes.setdefault(time, []).append(created_node)
         if hub is self.map.end:
             self.end_reached = True
@@ -69,25 +70,37 @@ class Network:
 
     def find_edge(self, node: Node) -> None:
         for connection in node.real_hub.connections:
-            node1 = self.create_node(connection.start, node.time + 1)
-            node2 = self.create_node(connection.end, node.time + 1)
-
-            if node1.real_hub is node.real_hub:
-                new_edge = self.create_edge(connection, node, node2)
-                static_edge = self.create_edge(None, node, node1)
+            if node.real_hub is connection.start:
+                start = connection.start
+                end = connection.end
             else:
-                new_edge = self.create_edge(connection, node, node1)
-                static_edge = self.create_edge(None, node, node2)
+                start = connection.end
+                end = connection.start
 
+            static_node = self.create_node(start, node.time + 1)
+            static_edge = self.create_edge(None, node, static_node)
+            new_node = self.create_node(end, node.time + 1)
+            new_edge = self.create_edge(connection, node, new_node)
+
+            new_node.set_previous_connection(connection)
             node.edges.append(new_edge)
             node.edges.append(static_edge)
         node.sort_edges()
 
     def next_step(self) -> None:
         for node in self.nodes.get(self.step, []):
-            self.find_edge(node)
+            if not isinstance(node, ConnectionNode)\
+                    and node.real_hub.zone == Zone.RESTRICTED:
+                new_node = self.create_node(
+                    node.real_hub, node.time + 1, ConnectionNode)
+                new_edge = self.create_edge(
+                    node.previous_connection, node, new_node)
+                node.edges.append(new_edge)
+            else:
+                self.find_edge(node)
         self.step += 1
 
+    # if node1.real_hub.zone is Zone.RESTRICTED:
     # def is_in_loop(self) -> bool:
     #     if self.nodes is not None and self.step >= 2:
     #         pool = {

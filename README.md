@@ -65,37 +65,32 @@ lgirard
 [x] Verifier presence de end_hub et start_hub
 
 debug:
-    [x] probleme affichage sur maze nightmare
-    [x] est ce que le make import c est une bonne idee ?
-    [x] self.map.coordinate_translation() shoulds i use this
+[x] probleme affichage sur maze nightmare
+[x] est ce que le make import c est une bonne idee ?
+[x] self.map.coordinate_translation() shoulds i use this
 algo:
-    [x] lire doc dict.setdefault
-    [x] changer dossier assets
-	[x] mettre les hubs a la bonne taille
-    [x] animation des drones
-    [x] priority
-    [x] blocked
-    [x] amelioration des performances sur les autres maps
-    [x] dans set_colors, securiser la présence des themes
-    [x] output file
-    [ ] adapter pour voir le nombre de drones par hub
-    [ ] restricted
-    [ ] arreter algo, si next ne donne pas de nouveau hub apres trois 
-    [ ] output file for restricted zone
-    [ ] readme a faire
+[x] lire doc dict.setdefault
+[x] changer dossier assets
+[x] mettre les hubs a la bonne taille
+[x] animation des drones
+[x] priority
+[x] blocked
+[x] amelioration des performances sur les autres maps
+[x] dans set_colors, securiser la présence des themes
+[x] output file
+[x] adapter pour voir le nombre de drones par hub
+[x] restricted
+[ ] arreter algo, si next ne donne pas de nouveau hub apres trois
+[ ] output file for restricted zone
+[ ] readme a faire
 
-    # def coordinate_translation(self) -> None:
-    #     for hub in self.hubs:
-    #         print(hub.name, hub.x, hub.y)
-    #     min_x = min([hub.x for hub in self.hubs])
-    #     min_y = min([hub.y for hub in self.hubs])
-    #     if min_x < 0:
-    #         for hub in self.hubs:
-    #             hub.x = hub.x - min_x
-    #     if min_y < 0:
-    #         for hub in self.hubs:
-    #             hub.y = hub.y - min_y
-    #     print()
-    #     for hub in self.hubs:
-    #         print(hub.name, hub.x, hub.y)
-end
+hubs: list[dict[hubs.name, n_drones]]
+for path in paths:
+    if self.step == -1:
+        print(f"Start: {self.map.nb_drones}")
+        return
+    if self.step >= len(self.paths):
+        hubs[self.map.End.name] += algo.get_blockin_flow(path)
+la liste represente les steps
+le dictionnaire represente le nombre de drones par hub a ce step la
+on itere a travers tous les paths a un instant t pour additioner a ce step la si il existe, pas avant pas apres, le nombre de drone par hub dans tous les paths

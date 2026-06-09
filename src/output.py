@@ -1,4 +1,4 @@
-from src.utils import Map
+from src.utils import Map, Zone
 from src.algo import DFS
 
 
@@ -28,6 +28,9 @@ def output_format(map: Map, algo: DFS) -> None:
                 continue
             for drone in drones:
                 if drone.path == path:
+                    # if path[step + 1][1].real_hub.zone == Zone.RESTRICTED:
+                    #     "\033[1;32mConnection\033[0m"
+                    # else:
                     hub_name = path[step + 1][1].real_hub.name
                     line += f"D{drone.id + 1}-{hub_name} "
         print(line)

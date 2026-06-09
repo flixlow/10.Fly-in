@@ -12,17 +12,12 @@ class Displayer:
         self.time: int = -1
         self.set_screen()
         self.set_padding(0.05)
-        self.set_origin()
         self.set_max_coordinates()
         self.set_scales()
+        self.set_origin()
         self.set_colors()
         self.set_size()
         self.set_drone_icon()
-
-    def set_size(self) -> None:
-        self.line_width = max(1, int(self.scale * 0.05))
-        self.outside_hub = max(1, int(self.scale * 0.1))
-        self.inside_hub = self.outside_hub - self.outside_hub // 3
 
     def set_screen(self) -> None:
         pygame.init()
@@ -33,23 +28,31 @@ class Displayer:
         self.screen = pygame.display.set_mode((self.width, self.height))
 
     def set_padding(self, padding: float) -> None:
-        width_padding: float = self.width * padding
-        height_padding: float = self.height * padding
-        self.padding = max(width_padding, height_padding)
-
-    def set_origin(self) -> None:
-        self.x_center: float = self.padding
-        self.y_center: float = self.height / 2
+        self.width_padding: float = self.width * padding
+        self.height_padding: float = self.height * padding
 
     def set_max_coordinates(self) -> None:
-        self.max_x: int = max(2, max([hub.x for hub in self.map.hubs]))
-        self.max_y: int = max(2, max([hub.y for hub in self.map.hubs]))
+        self.max_x = max([hub.x for hub in self.map.hubs])
+        self.min_x = min([hub.x for hub in self.map.hubs])
+        self.max_y = max([hub.y for hub in self.map.hubs])
+        self.min_y = min([hub.y for hub in self.map.hubs])
+
+        self.x_max_range = self.max_x - self.min_x
+        self.y_max_range = self.max_y - self.min_y
 
     def set_scales(self) -> None:
-        usable_width = self.width - (self.padding * 2)
-        usable_height = self.height - (self.padding * 2)
-        self.scale: float = min(usable_width / self.max_x,
-                                usable_height / self.max_y)
+        self.usable_width = self.width - (self.width_padding * 2)
+        self.usable_height = self.height - (self.height_padding * 2)
+
+        max_range = max(self.x_max_range, self.y_max_range)
+        self.scale: float = min(500, max(self.usable_width / max_range,
+                                         self.usable_height / max_range))
+
+    def set_origin(self) -> None:
+        center_x = (self.min_x + self.max_x) / 2
+        center_y = (self.min_y + self.max_y) / 2
+        self.x_center: float = self.width / 2 - (self.scale * center_x)
+        self.y_center: float = self.height / 2 - (self.scale * center_y)
 
     def set_colors(self) -> None:
         try:
@@ -67,6 +70,11 @@ class Displayer:
         self.back_color: tuple[int, int, int] = self.themes[0]["back"]
         self.line_color: tuple[int, int, int] = self.themes[0]["line"]
         self.text_color: tuple[int, int, int] = self.themes[0]["text"]
+
+    def set_size(self) -> None:
+        self.line_width = max(1, int(self.scale * 0.05))
+        self.outside_hub = max(1, int(self.scale * 0.1))
+        self.inside_hub = self.outside_hub - self.outside_hub // 3
 
     def set_drone_icon(self) -> None:
         drone_icon = pygame.image.load("assets/drone_icon.png").convert_alpha()
@@ -128,7 +136,9 @@ class Displayer:
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",
                                 True, self.text_color)
-        self.screen.blit(text, (int(self.padding//2), int(self.padding//2)))
+        self.screen.blit(text, (
+            int(self.width_padding//2),
+            int(self.height_padding//2)))
 
     def display(self) -> None:
         clock = pygame.time.Clock()
