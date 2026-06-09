@@ -1,7 +1,7 @@
 ARG ?=
 
 run: install
-	uv run python3 -B -m src $(ARG)
+	uv run python3 -m src $(ARG)
 
 install: map
 	uv sync

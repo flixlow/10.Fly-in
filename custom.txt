@@ -21,4 +21,4 @@ connection: node_8-node_6
 connection: node_7-node_6
 connection: node_5-node_6
 connection: node_4-node_6
-connection: node_6-node_a
+connection: node_6-node_a [max_link_capacity=10]

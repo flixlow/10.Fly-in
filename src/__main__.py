@@ -13,16 +13,16 @@ def command_line() -> str:
     parser.add_argument("--directory", default="maps")
     command_line = parser.parse_args()
 
-    current_path: str = command_line.directory
-    while (True):
-        choices = os.listdir(current_path)
-        r = questionary.select("Please, select:", choices=choices).ask()
-        current_path = f"{current_path}/{r}"
-        if os.path.isfile(current_path):
-            break
-
     if command_line.input is not None:
         current_path = command_line.input
+    else:
+        current_path = command_line.directory
+        while (True):
+            choices = os.listdir(current_path)
+            r = questionary.select("Please, select:", choices=choices).ask()
+            current_path = f"{current_path}/{r}"
+            if os.path.isfile(current_path):
+                break
 
     if not current_path.endswith(".txt"):
         raise ValueError(f"File must be a .txt : {current_path}")
