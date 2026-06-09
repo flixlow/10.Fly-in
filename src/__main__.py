@@ -1,9 +1,10 @@
 import os
 import questionary  # type: ignore
 from argparse import ArgumentParser
+from src.parser import Parser
 from src.network import Network
 from src.algo import DFS
-from src.parser import Parser
+from src.output import output_format
 
 
 def command_line() -> str:
@@ -28,12 +29,6 @@ def command_line() -> str:
     return current_path
 
 
-class Drone:
-    def __init__(self, id: int, path: list[tuple]) -> None:
-        self.id = id
-        self.path = path
-
-
 def main() -> None:
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
     from src.display import Displayer
@@ -50,6 +45,8 @@ def main() -> None:
     while algo.max_flow < map.nb_drones:
         algo.get_max_flow()
         network.next_step()
+
+    output_format(map, algo)
 
     displayer = Displayer(map, algo.paths)
     displayer.display()

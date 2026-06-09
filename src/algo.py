@@ -7,6 +7,7 @@ class DFS:
         self.network = network
         self.max_flow: int = 0
         self.paths: list = []
+        self.flow_by_paths: list = []
 
     def add_passage(self, path: list[tuple[Edge, Node]], flow: int) -> None:
         for edge, node in path:
@@ -21,6 +22,7 @@ class DFS:
             flow += current_flow
             self.add_passage(path, current_flow)
             self.paths.append(path)
+            self.flow_by_paths.append(current_flow)
 
         self.max_flow = flow
         return flow

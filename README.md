@@ -67,22 +67,22 @@ lgirard
 debug:
     [x] probleme affichage sur maze nightmare
     [x] est ce que le make import c est une bonne idee ?
-    [ ] self.map.coordinate_translation() shoulds i use this
+    [x] self.map.coordinate_translation() shoulds i use this
 algo:
     [x] lire doc dict.setdefault
     [x] changer dossier assets
 	[x] mettre les hubs a la bonne taille
-    [ ] readme a faire
     [x] animation des drones
-    [ ] arreter algo, si next ne donne pas de nouveau hub apres trois appels
-    [ ] priority
-    [ ] priority
-    [ ] priority
+    [x] priority
+    [x] blocked
     [x] amelioration des performances sur les autres maps
-    [ ] adapter pour voir le nombre de drones par hub
     [x] dans set_colors, securiser la présence des themes
-    [ ] output file
-    [ ]
+    [x] output file
+    [ ] adapter pour voir le nombre de drones par hub
+    [ ] restricted
+    [ ] arreter algo, si next ne donne pas de nouveau hub apres trois 
+    [ ] output file for restricted zone
+    [ ] readme a faire
 
     # def coordinate_translation(self) -> None:
     #     for hub in self.hubs:
@@ -98,4 +98,4 @@ algo:
     #     print()
     #     for hub in self.hubs:
     #         print(hub.name, hub.x, hub.y)
-end 
+end
