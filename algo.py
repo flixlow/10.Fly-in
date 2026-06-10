@@ -1,30 +1,29 @@
-from src.network import Network, Node, Edge
-from src.utils import Zone
+from network import Network, Node, Edge
+from utils import Zone
 
 
 class DFS:
     def __init__(self, network: Network) -> None:
+        """DFS based flow finder for the time-expanded network.
+
+        Parameters
+        ----------
+        network : Network
+            The time-expanded network on which to perform the search.
+
+        Attributes
+        ----------
+        max_flow : int
+            Current total flow found.
+        paths : list
+            List of found augmenting paths (each is a list of (Edge, Node)).
+        flow_by_paths : list
+            Flow value associated with each discovered path.
+        """
         self.network = network
         self.max_flow: int = 0
         self.paths: list[list[tuple[Edge, Node]]] = []
         self.flow_by_paths: list[int] = []
-
-    """DFS based flow finder for the time-expanded network.
-
-    Parameters
-    ----------
-    network : Network
-        The time-expanded network on which to perform the search.
-
-    Attributes
-    ----------
-    max_flow : int
-        Current total flow found.
-    paths : list
-        List of found augmenting paths (each is a list of (Edge, Node)).
-    flow_by_paths : list
-        Flow value associated with each discovered path.
-    """
 
     def add_passage(self, path: list[tuple[Edge, Node]], flow: int) -> None:
         """Apply a flow increment to all edges and nodes in ``path``.

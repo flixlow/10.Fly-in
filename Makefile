@@ -1,13 +1,18 @@
 ARG ?=
+LINT_FLAG = --warn-return-any \
+			--warn-unused-ignores \
+			--ignore-missing-imports \
+			--disallow-untyped-defs \
+			--check-untyped-defs
 
 run: install
-	uv run python3 -m src $(ARG)
+	uv run main.py $(ARG)
 
 install: map
 	uv sync
 
 debug:
-	uv run -m pdb -m src
+	uv run pdb main.py
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
@@ -16,10 +21,12 @@ clean:
 	rm -rf maps
 
 lint: install
-	uv run flake8 src && uv run mypy src --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	uv run flake8 . --exclude .venv 
+	uv run mypy . --exclude .venv $(LINT_FLAG)
 
 lint-strict: install
-	uv run flake8 src && uv run mypy src --strict
+	uv run flake8 . --exclude .venv
+	uv run mypy . --exclude .venv --strict
 
 map: maps/.installed
 

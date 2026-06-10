@@ -1,6 +1,6 @@
+from network import Edge, Node
+from utils import Map, Hub
 import pygame
-from src.network import Edge, Node
-from src.utils import Map, Hub
 import json
 
 

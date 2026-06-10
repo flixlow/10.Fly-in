@@ -1,5 +1,5 @@
 from __future__ import annotations
-from src.utils import Map, Hub, Connection, Zone
+from utils import Map, Hub, Connection, Zone
 from functools import lru_cache
 
 

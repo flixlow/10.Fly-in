@@ -1,6 +1,6 @@
-from src.utils import Map, Zone
-from src.algo import DFS
-from src.network import Edge, Node, ConnectionNode
+from utils import Map, Zone
+from algo import DFS
+from network import Edge, Node, ConnectionNode
 
 
 class Drone:

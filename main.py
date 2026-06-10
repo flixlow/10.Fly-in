@@ -1,10 +1,10 @@
 import os
 import questionary
 from argparse import ArgumentParser
-from src.parser import Parser
-from src.network import Network
-from src.algo import DFS
-from src.output import Output
+from parser import Parser
+from network import Network
+from algo import DFS
+from output import Output
 
 
 def command_line() -> str:
@@ -54,7 +54,7 @@ def main() -> None:
     prints textual output and launches the visual display.
     """
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-    from src.display import Displayer
+    from display import Displayer
 
     file = command_line()
     file_parser = Parser(file)
