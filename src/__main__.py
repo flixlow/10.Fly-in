@@ -9,8 +9,8 @@ from src.output import Output
 
 def command_line() -> str:
     parser = ArgumentParser()
-    parser.add_argument("--input", default=None)
-    parser.add_argument("--directory", default="maps")
+    parser.add_argument('-i', "--input", default=None)
+    parser.add_argument('-d', "--directory", default="maps")
     command_line = parser.parse_args()
 
     if command_line.input is not None:
@@ -58,7 +58,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        raise e
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
         print("\033[1;32m[END]\033[0m")

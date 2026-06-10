@@ -9,7 +9,7 @@ class Displayer:
                  paths: list[list[tuple[Edge, Node]]]) -> None:
         self.map: Map = map
         self.paths: list[list[tuple[Edge, Node]]] = paths
-        self.time: int = -1
+        self.step: int = -1
         self.set_screen()
         self.set_padding(0.05)
         self.set_max_coordinates()
@@ -115,14 +115,14 @@ class Displayer:
             pygame.draw.circle(self.screen, color, (x, y), self.inside_hub)
 
     def get_hub(self, path: list[tuple[Edge, Node]]) -> Hub:
-        if self.time == -1:
+        if self.step == -1:
             if self.map.start:
                 return self.map.start
 
-        if self.time >= len(path):
+        if self.step >= len(path):
             return path[-1][1].real_hub
 
-        return path[self.time][1].real_hub
+        return path[self.step][1].real_hub
 
     def display_drones(self) -> None:
         for path in self.paths:
@@ -136,14 +136,19 @@ class Displayer:
     def display_text(self) -> None:
         text = self.font.render(f"Fly-in: {self.map.name}",
                                 True, self.text_color)
+        step = self.font.render(f"{self.step + 1}/{self.max_path_len}",
+                                True, self.text_color)
         self.screen.blit(text, (
             int(self.width_padding//2),
             int(self.height_padding//2)))
+        self.screen.blit(step, (
+            int(self.width - self.width_padding * 2),
+            int(self.height - self.height_padding * 2)))
 
     def display(self) -> None:
         clock = pygame.time.Clock()
         running = True
-        max_path_len = max((len(path) for path in self.paths), default=0)
+        self.max_path_len = max((len(path) for path in self.paths), default=0)
         while running:
             self.screen.fill(self.back_color)
             for event in pygame.event.get():
@@ -155,11 +160,11 @@ class Displayer:
                     if event.key == pygame.K_SPACE:
                         self.change_theme()
                     if event.key == pygame.K_RIGHT:
-                        if self.time < max_path_len:
-                            self.time += 1
+                        if self.step < (self.max_path_len - 1):
+                            self.step += 1
                     if event.key == pygame.K_LEFT:
-                        if self.time > -1:
-                            self.time -= 1
+                        if self.step > -1:
+                            self.step -= 1
 
             self.display_connections()
             self.display_hubs()

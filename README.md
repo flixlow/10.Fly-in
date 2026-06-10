@@ -34,13 +34,15 @@ make install
 - Pour lancer avec un dossier spécifique :
 
 	```bash
-	make $ARG="--directory nom_du_dossier"
+	make ARG="--directory nom_du_dossier"
+	make ARG="--d nom_du_dossier"
 	```
 
 - Pour lancer avec une carte spécifique :
 
 	```bash
-	make $ARG="--input maps/nom_de_la_carte.txt"
+	make ARG="--input maps/nom_de_la_carte.txt"
+	make ARG="--i maps/nom_de_la_carte.txt"
 	```
 
 - Nettoyage et utilitaires :
@@ -115,12 +117,6 @@ Ces éléments visuels aident l'utilisateur à comprendre :
 
 ## Contribution et améliorations possibles
 
-- Remplacer le DFS par une implémentation plus efficace (par ex. Dinic) pour traiter de plus grands graphes.
-- Ajout d'options CLI pour configurer la vitesse d'animation, le thème, ou les heuristiques de priorité.
 - Tests unitaires et validation automatique des parsers et des invariants de capacité.
 
 ---
-
-Si vous souhaitez que j'ajoute des exemples de cartes, des captures d'écran ou une version anglophone du
-README, dites-le moi et je m'en occupe.
-

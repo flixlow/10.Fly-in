@@ -1,5 +1,12 @@
-from src.utils import Map, Zone, Drone
+from src.utils import Map, Zone
 from src.algo import DFS
+from src.network import Edge, Node
+
+
+class Drone:
+    def __init__(self, id: int, path: list[tuple[Edge, Node]]) -> None:
+        self.id = id
+        self.path = path
 
 
 class Output:
@@ -20,6 +27,8 @@ class Output:
                 self.name += 1
 
     def print_output(self) -> None:
+        if not self.algo.network.is_running:
+            print("\033[1;38;5;208m[WARNING]\033[0m No solution was found.")
         for step in range(self.len_max - 1):
             line = ""
             for path in self.algo.paths:
@@ -37,8 +46,7 @@ class Output:
                                 connection = edge.real_connection.name
                             else:
                                 connection = "None"
-                            line += "\033[34m"
-                            line += f"D{drone.id + 1}-{connection}"
+                            line += f"\033[34mD{drone.id + 1}-{connection}"
                         elif node.real_hub.zone == Zone.PRIORITY:
                             line += "\033[31m"
                             line += f"D{drone.id + 1}-{node.real_hub.name}"

@@ -91,6 +91,18 @@ class Network:
             node.edges.append(static_edge)
         node.sort_edges()
 
+    def verify_infinite_loop(self) -> None:
+        last_created = set(
+            node.real_hub for node in self.nodes.get(self.step, []))
+        if last_created.issubset(self.already_created):
+            if self.repetition > 3:
+                self.is_running = False
+                return
+            self.repetition += 1
+        else:
+            self.repetition = 0
+            self.already_created.update(last_created)
+
     def next_step(self) -> None:
         for node in self.nodes.get(self.step, []):
             if not isinstance(node, ConnectionNode)\
@@ -103,15 +115,6 @@ class Network:
             else:
                 self.find_edge(node)
 
-        last_created = set(
-            node.real_hub for node in self.nodes.get(self.step, []))
-        if last_created.issubset(self.already_created):
-            self.repetition += 1
-            if self.repetition >= 3:
-                self.is_running = False
-                return
-        else:
-            self.repetition = 0
-            self.already_created.update(last_created)
-
+        if not self.end_reached:
+            self.verify_infinite_loop()
         self.step += 1

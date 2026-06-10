@@ -1,13 +1,6 @@
 from pydantic import BaseModel, Field
-from src.network import Edge, Node
 from pathlib import Path
 from enum import Enum
-
-
-class Drone:
-    def __init__(self, id: int, path: list[tuple[Edge, Node]]) -> None:
-        self.id = id
-        self.path = path
 
 
 class Color(Enum):
