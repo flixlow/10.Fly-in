@@ -16,10 +16,10 @@ clean:
 	rm -rf maps
 
 lint:
-	uv run flake8 src && mypy src --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	uv run flake8 src && uv run mypy src --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	flake8 src && mypy src --strict
+	uv run flake8 src && uv run mypy src --strict
 
 map: maps/.installed
 

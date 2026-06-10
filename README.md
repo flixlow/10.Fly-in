@@ -1,97 +1,125 @@
 *This project has been created as part of the 42 curriculum by flauweri.*
 
-# Fly-in
-
 ## Description
-Fly-in is a small simulator that plans and visualizes drone routes on a network of hubs and connections. The tool parses plain-text map descriptions, constructs a time-expanded network to model drone movement and hub/link capacities, computes feasible routes using a max-flow approach built on DFS-based path finding, and visualizes drone movements using Pygame. The goal is to demonstrate constrained routing, capacity management, and an interactive visual representation of the resulting schedules.
+
+Fly-in est un simulateur de routage de drones. L'objectif
+du projet est de calculer et d'afficher des trajectoires permettant d'envoyer un nombre donné
+de drones d'un hub de départ vers un hub d'arrivée en respectant des contraintes de capacité
+sur les hubs et sur les liaisons, ainsi que des règles liées aux zones (normal, prioritaire,
+restreinte, bloquée). Le simulateur construit un graphe dépendant du temps (time-expanded graph),
+recherche des chemins d'acheminement valides puis affiche la simulation.
 
 ## Instructions
-This project provides a Makefile with convenient targets to prepare and run the application.
 
-Common targets:
-- make map
-  - Extract example maps from data/maps.tar.gz into the maps/ directory.
-- make install
-  - Ensures maps are installed and synchronizes the virtual environment / dependencies (project-specific sync command).
-- make run
-  - Builds prerequisites and runs the app: equivalent to "python3 -B -m src". You can pass an optional ARG to change runtime behavior: `make run ARG="--input maps/example_map.txt"`.
-- make debug
-  - Run the application under pdb: `make debug`
-- make clean
-  - Remove caches, virtualenv, and maps folder.
-- make lint
-  - Run linters and mypy checks.
-- make lint-strict
-  - Run stricter linting.
+- Prérequis : Python >= 3.13, dépendances listées dans `pyproject.toml` (pygame, pydantic, questionary, ...).
 
-Examples:
-- Prepare maps and run: make install && make run
-- Run with a specific map: make run ARG="--input maps/example_map.txt"
+- Pour installer l'environnement virtuel:
 
-## Resources
-References and helpful links:
-- Regex testing: https://regex101.com/
-- Time-expanded networks & max flow: standard algorithm texts (e.g., CLRS)
-- Pygame docs: https://www.pygame.org/docs/
-- Pydantic docs: https://pydantic-docs.helpmanual.io/
-- fly-in editor: https://flyin-editor.cheznestor.fr/
+```bash
+make install
+```
 
-AI usage
-- AI-assisted for README, docstring
+- Pour préparer les cartes fournies :
 
-## Algorithm choices and implementation strategy
-Overview:
-- Time-expanded network: each hub is represented as a node per time step; two types of edges model waiting (stay in same hub) and movement (follow a connection) between consecutive time layers.
-- Capacities:
-  - Hub capacity: each hub has a max_drones value limiting how many drones can occupy it at a given time.
-  - Link capacity: each connection has max_link_capacity to limit concurrent traversals.
-- Node types:
-  - Regular Node: represents hub at a time step.
-  - ConnectionNode: used for special handling when a restricted zone requires using previous connection to move forward.
-- Path finding & flow:
-  - DFS-based augmenting path search finds one feasible path from start to end in the time-expanded graph while respecting capacities and zone rules.
-  - For each found path, a blocking flow (the minimum residual capacity along the path) is applied to update edge and node passages.
-  - The algorithm repeats until no more augmenting paths are available or the required number of drones is scheduled.
-- Zones handling:
-  - NORMAL, BLOCKED, RESTRICTED, PRIORITY are supported.
-  - BLOCKED hubs are pruned from exploration.
-  - RESTRICTED hubs are treated to ensure drones enter and exit respecting special connection constraints.
-  - PRIORITY edges/hubs are considered first when sorting exploration edges.
+	```bash
+	make map
+	```
 
-Design rationale:
-- Time expansion simplifies capacity and concurrency constraints by turning scheduling into a pure flow problem.
-- DFS-based path search is simple and effective for the small to medium maps targeted by the project.
-- The code is modular: parser, network builder, flow algorithm, and visualizer are separated to ease testing and extension.
+- Pour lancer l'application (sélection interactive d'une carte) :
 
-## Visual representation features
-- Based on Pygame, the visualizer:
-  - Draws hubs and connections with scalable coordinates and padding to fit the window.
-  - Uses themes (background, line, and text colors) loaded from assets/themes.json; press Space to cycle themes.
-  - Shows drone icons moving along paths; time steps advance with arrow keys to inspect schedules.
-  - Distinguishes restricted movement events (special coloring in console output).
-- UX benefits:
-  - Immediate visual feedback of schedule conflicts and capacity constraints.
-  - Theme switching aids readability on different display environments.
-  - Manual time control helps debugging and demonstration.
+	```bash
+	make run
+	```
 
-## Usage examples
-- Prepare a map file in the maps directory (see example format in maps/).
-- Start the app via Makefile: make install && make run
-- Select a map, let the algorithm compute routes, then inspect movement in the visualizer.
+- Pour lancer avec un dossier spécifique :
 
-## Project structure (high level)
-- src/
-  - parser.py : map parsing and validation
-  - network.py : time-expanded network model
-  - algo.py : DFS-based flow finder and path management
-  - display.py : Pygame visualizer
-  - output.py : textual step output
-  - utils.py : data models (Hub, Connection, Map, etc.)
+	```bash
+	make $ARG="--directory nom_du_dossier"
+	```
 
-## Contributing
-Report bugs or suggest improvements by opening issues or pull requests. Keep map format and semantics compatible with parser expectations.
+- Pour lancer avec une carte spécifique :
+
+	```bash
+	make $ARG="--input maps/nom_de_la_carte.txt"
+	```
+
+- Nettoyage et utilitaires :
+
+	```bash
+	make clean
+	make lint
+	```
+
+## Ressources
+
+- Algorithmes de flot : documentation et articles sur Edmonds–Karp, Dinic et flots sur réseaux (ouvrages et articles en ligne).
+- Pygame : https://www.pygame.org/
+- Pydantic : https://docs.pydantic.dev/
+
+Utilisation de l'IA :
+- J'ai utilisé une assistance IA pour rédiger et structurer ce fichier `README.md` uniquement (description, sections,
+	mise en forme et explication générale des choix). Aucun code source n'a été généré ou modifié par l'IA.
+
+## Choix d'algorithme et stratégie d'implémentation
+
+- Représentation temporelle : le graphe est étendu dans le temps : chaque hub est instancié pour chaque pas de temps
+	nécessaire. Cela permet de modéliser le déplacement des drones d'un pas de temps à l'autre et d'appliquer des
+	capacités sur les hubs et les liaisons.
+- Nœuds et arcs :
+	- `Node` représente un hub à un instant donné ; il garde la trace des arêtes sortantes et du nombre de passages.
+	- `Edge` représente une liaison (ou une attente statique) avec une capacité de lien (`max_link_capacity`).
+- Recherche de chemins :
+	- Une recherche en profondeur (DFS) est utilisée pour extraire des chemins augmentants dans le graphe temps-dépendant.
+	- Pour chaque chemin trouvé, on calcule le flux bloquant possible en regardant les capacités restantes des arêtes
+		et des nœuds (hubs) du chemin, puis on applique ce flux (incrémentation des compteurs `passage`).
+	- Les arêtes sont triées pour privilégier les zones `PRIORITY` lorsqu'il y a un choix, ce qui favorise l'usage
+		de hubs prioritaires pour améliorer l'expérience utilisateur ou des contraintes métier.
+- Boucle d'exécution :
+	- Construction progressive du réseau via `Network.next_step()` jusqu'à ce que le graphe n'évolue plus
+		ou qu'un seuil de répétition soit atteint.
+	- Application répétée de la collecte de chemins augmentants (`DFS.get_max_flow()`) jusqu'à atteindre
+		le nombre de drones requis (`map.nb_drones`) ou épuiser les possibilités.
+
+## Représentation visuelle et expérience utilisateur
+
+- Échelle adaptative : l'affichage calcule automatiquement l'échelle et le centre pour que la carte
+	s'adapte à la taille de la fenêtre (padding, scale, origin).
+- Thèmes et couleurs : support d'un fichier `assets/themes.json` pour personnaliser les couleurs de fond,
+	lignes et textes ; basculement possible entre thèmes.
+- Hubs et liaisons : les hubs sont dessinés avec des tailles dépendant de l'échelle ; les liaisons sont tracées
+	en lignes. Les hubs prioritaire/restricted sont représentés par des couleurs et styles différents pour
+	indiquer visuellement leurs effets sur les trajectoires.
+- Drones : icônes graphiques (`assets/drone_icon.png`) utilisées pour animer les drones le long des chemins trouvés.
+	L'animation se fait pas à pas suivant l'horloge interne et la longueur des chemins extraits par l'algorithme.
+- Texte et information : affichage du nom de la carte et autres informations utiles pendant la simulation
+	(police incluse dans `assets` si disponible).
+
+Ces éléments visuels aident l'utilisateur à comprendre :
+- pourquoi certains drones prennent des chemins différents (priorité / capacité),
+- où se produisent les saturations ou blocages (zones restreintes / capacités atteintes),
+- l'évolution temporelle des déplacements (animation pas-à-pas).
+
+## Exemples d'utilisation
+
+- Simulation rapide (sélection interactive) : `python3 -m src` puis choisir une carte.
+- Exécution non interactive : `python3 -m src --input maps/exemple.txt`.
+
+## Structure du projet (brève)
+
+- `src/parser.py` : lecture et validation des fichiers de carte (.txt) et construction de l'objet `Map`.
+- `src/network.py` : construction du graphe temps-dépendant (nœuds, arêtes) et évolution par pas de temps.
+- `src/algo.py` : recherche de chemins augmentants, calcul des flux et application des passages.
+- `src/output.py` : génération de la sortie texte (liste de mouvements par pas) et création des objets `Drone`.
+- `src/display.py` : affichage Pygame de la carte et animation des drones.
+
+## Contribution et améliorations possibles
+
+- Remplacer le DFS par une implémentation plus efficace (par ex. Dinic) pour traiter de plus grands graphes.
+- Ajout d'options CLI pour configurer la vitesse d'animation, le thème, ou les heuristiques de priorité.
+- Tests unitaires et validation automatique des parsers et des invariants de capacité.
 
 ---
 
-If you need a sample README variation or an example map file to include in the repository, request it and it will be provided.
+Si vous souhaitez que j'ajoute des exemples de cartes, des captures d'écran ou une version anglophone du
+README, dites-le moi et je m'en occupe.
 

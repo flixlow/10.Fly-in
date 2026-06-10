@@ -1,5 +1,5 @@
 import os
-import questionary  # type: ignore
+import questionary
 from argparse import ArgumentParser
 from src.parser import Parser
 from src.network import Network
@@ -26,7 +26,7 @@ def command_line() -> str:
 
     if not current_path.endswith(".txt"):
         raise ValueError(f"File must be a .txt : {current_path}")
-    return current_path
+    return str(current_path)
 
 
 def main() -> None:

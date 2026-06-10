@@ -1,3 +1,4 @@
+from __future__ import annotations
 from src.utils import Map, Hub, Connection, Zone
 from functools import lru_cache
 
@@ -16,7 +17,7 @@ class Node:
         return self.real_hub.max_drones - self.passage
 
     @staticmethod
-    def is_priority_zone(edge) -> bool:
+    def is_priority_zone(edge: Edge) -> bool:
         if edge.real_connection is None:
             return False
         hub = edge.real_connection.end

@@ -6,8 +6,8 @@ class DFS:
     def __init__(self, network: Network) -> None:
         self.network = network
         self.max_flow: int = 0
-        self.paths: list = []
-        self.flow_by_paths: list = []
+        self.paths: list[list[tuple[Edge, Node]]] = []
+        self.flow_by_paths: list[int] = []
 
     def add_passage(self, path: list[tuple[Edge, Node]], flow: int) -> None:
         for edge, node in path:
@@ -35,7 +35,7 @@ class DFS:
 
     def find_one_path(self, node: Node, path: list[tuple[Edge, Node]],
                       visited_nodes: set[Node], visited_edges: set[Edge],
-                      dead_ends: set[Node]) -> None | list[tuple]:
+                      dead_ends: set[Node]) -> None | list[tuple[Edge, Node]]:
         if node in dead_ends:
             return None
 

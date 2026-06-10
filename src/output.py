@@ -33,7 +33,10 @@ class Output:
                         if node.real_hub.zone == Zone.RESTRICTED and\
                                 path[step][1].real_hub.zone != Zone.RESTRICTED:
                             edge = path[step + 1][0]
-                            connection = edge.real_connection.name
+                            if edge.real_connection is not None:
+                                connection = edge.real_connection.name
+                            else:
+                                connection = "None"
                             line += "\033[34m"
                             line += f"D{drone.id + 1}-{connection}"
                         elif node.real_hub.zone == Zone.PRIORITY:
