@@ -60,7 +60,7 @@ make install
 - Pydantic : https://docs.pydantic.dev/
 
 Utilisation de l'IA :
-- J'ai utilisé une assistance IA pour rédiger et structurer ce fichier `README.md` uniquement (description, sections,
+- J'ai utilisé une assistance IA pour rédiger et structurer ce fichier `README.md` ainsi que les docstrings (description, sections,
 	mise en forme et explication générale des choix). Aucun code source n'a été généré ou modifié par l'IA.
 
 ## Choix d'algorithme et stratégie d'implémentation
@@ -120,3 +120,5 @@ Ces éléments visuels aident l'utilisateur à comprendre :
 - Tests unitaires et validation automatique des parsers et des invariants de capacité.
 
 ---
+
+docstring manquante au format pep257 numpy style en anglais stp

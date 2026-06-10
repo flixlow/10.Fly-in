@@ -6,6 +6,13 @@ from src.error import MapError, HubError, ConnectionError, MetadataError
 
 
 class Parser:
+    """Parse and validate Fly-in map files.
+
+    The parser accepts a file path at construction, reads the file and
+    exposes ``validate()`` which performs a full syntactic and semantic
+    check producing a populated `Map` instance or raising a specific
+    error explaining what failed.
+    """
     def __init__(self, file: str) -> None:
         self.lines: list[str] = self.open(file)
         self.hub_pattern: Pattern[str] = re.compile(
@@ -21,6 +28,23 @@ class Parser:
         self.map: Map = Map(file)
 
     def open(self, file: str) -> list[str]:
+        """Read a file and return its lines.
+
+        Parameters
+        ----------
+        file : str
+            Path to the file to open.
+
+        Returns
+        -------
+        list[str]
+            File lines without trailing newline characters.
+
+        Raises
+        ------
+        FileNotFoundError, PermissionError, IsADirectoryError, OSError
+            Re-raises common IO errors with a contextual message.
+        """
         try:
             with open(file) as f:
                 return f.read().splitlines()
@@ -34,6 +58,19 @@ class Parser:
             raise OSError(f"{file}")
 
     def validate(self) -> Map:
+        """Validate parsed lines and construct the `Map`.
+
+        Iterates through the input lines, ignores comments and empty
+        lines and dispatches each meaningful line to specific
+        check/creation methods. Any error raised includes the offending
+        line number for easier debugging.
+
+        Returns
+        -------
+        Map
+            A populated `Map` instance ready to be converted into a
+            time-expanded network.
+        """
         for i, line in enumerate(self.lines, start=1):
             if line == "" or line.startswith('#'):
                 continue
@@ -45,10 +82,16 @@ class Parser:
                 self.first_line = True
         if self.start_hub is False or self.end_hub is False:
             raise MapError("Map is missing start or end hub.")
-        # self.map.coordinate_translation()
+
         return self.map
 
     def check_line(self, line: str) -> None:
+        """Process a single logical line from the input.
+
+        The method strips inline comments and dispatches the content to
+        the appropriate handler based on the line prefix. Raises
+        ``MapError`` for unknown line types.
+        """
         if '#' in line:
             line = line.split('#')[0]
         if line.startswith("nb_drones:"):
@@ -65,6 +108,12 @@ class Parser:
             raise MapError("Unknown line type.")
 
     def create_hub(self, line: str, hub: type) -> None:
+        """Create a `Hub` (or `Start`/`End`) from a hub definition line.
+
+        The line is matched against a regular expression and metadata
+        is parsed if present. For `Start` and `End` hubs the map's
+        ``nb_drones`` value is applied to ``max_drones``.
+        """
         if self.first_line is False:
             raise ValueError("First line must begin with 'nb_drones'.")
         tab = self.hub_pattern.fullmatch(line)
@@ -95,6 +144,12 @@ class Parser:
         self.map.hubs.append(new)
 
     def create_connection(self, line: str) -> None:
+        """Create a `Connection` between two existing hubs.
+
+        The connection line may specify an optional ``max_link_capacity``
+        metadata value. The method ensures hubs exist and appends the
+        created connection to both the hubs and the map.
+        """
         if self.first_line is False:
             raise ValueError("First line must begin with 'nb_drones'.")
         tab = self.connection_pattern.fullmatch(line)
@@ -121,6 +176,12 @@ class Parser:
         self.map.connections.append(Connection(**connection))
 
     def check_metadata(self, metadata: str) -> dict[str, Any]:
+        """Parse a metadata bracket string into a dict of values.
+
+        Supports multiple metadata items space-separated and guards
+        against duplicate keys. Delegates value parsing to
+        ``check_one_data``.
+        """
         multiple_declaration: list[str] = []
         ret: dict[str, Any] = {}
         for item in metadata.split():
@@ -134,6 +195,11 @@ class Parser:
         return ret
 
     def check_connection(self, start: str, end: str) -> None:
+        """Validate that a connection can be created between two hubs.
+
+        Checks that both hub names exist, are distinct and that the
+        connection is not already declared.
+        """
         start_end: set[str] = {start, end}
         hubs_name = [hub.name for hub in self.map.hubs]
         if start not in hubs_name or end not in hubs_name:
@@ -146,6 +212,15 @@ class Parser:
             self.connections.append(start_end)
 
     def check_start_and_end(self, name: str, position: bool) -> None:
+        """Ensure a single start and end hub are declared.
+
+        Parameters
+        ----------
+        name : str
+            Hub name being declared as start or end.
+        position : bool
+            True when declaring the start hub, False for end hub.
+        """
         if position and self.start_hub:
             raise MapError(f"Duplicated start_hub: {name}")
         elif position and not self.start_hub:
@@ -156,6 +231,11 @@ class Parser:
             self.end_hub = True
 
     def check_one_data(self, key: str, value: str) -> dict[str, Any]:
+        """Validate and convert a single metadata key/value pair.
+
+        Returns a dictionary with the appropriate typed value for the
+        given key. Unknown keys raise ``MetadataError``.
+        """
         if value == '':
             raise MetadataError(f"Empty metadata input for {key}.")
         match key:
@@ -163,7 +243,8 @@ class Parser:
                 try:
                     return ({"zone": Zone(value)})
                 except ValueError:
-                    raise MetadataError(f"'{value}' is not a valid zone type.")
+                    raise MetadataError(
+                        f"'{value}' is not a valid zone type.")
             case "color":
                 try:
                     return ({"color": Color(value.lower())})
@@ -184,6 +265,12 @@ class Parser:
                 raise MetadataError(f"Unknown key for metadata: '{key}'.")
 
     def check_nb_drones(self, value: str) -> None:
+        """Parse and validate the ``nb_drones`` declaration.
+
+        The method must be called on the first meaningful line of the
+        file and sets ``self.map.nb_drones`` to the provided positive
+        integer value.
+        """
         if self.first_line is True:
             raise ValueError("First line must begin with 'nb_drones'.")
         try:

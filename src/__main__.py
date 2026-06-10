@@ -8,6 +8,21 @@ from src.output import Output
 
 
 def command_line() -> str:
+    """
+    The function first inspects command-line arguments for an `-i/--input`
+    path. If not provided it interactively walks a directory tree using
+    `questionary` until a file is selected.
+
+    Returns
+    -------
+    str
+        Absolute or relative path to the chosen `.txt` map file.
+
+    Raises
+    ------
+    ValueError
+        If the resolved file path does not end with ``.txt``.
+    """
     parser = ArgumentParser()
     parser.add_argument('-i', "--input", default=None)
     parser.add_argument('-d', "--directory", default="maps")
@@ -30,6 +45,14 @@ def command_line() -> str:
 
 
 def main() -> None:
+    """Run the full Fly-in workflow.
+
+    This function performs environment setup for the Pygame prompt,
+    loads and validates the selected map, constructs the simulation
+    network and runs the flow algorithm until either the simulation
+    finishes or the desired number of drones is allocated. It then
+    prints textual output and launches the visual display.
+    """
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
     from src.display import Displayer
 
@@ -58,6 +81,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
+        raise e
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
         print("\033[1;32m[END]\033[0m")

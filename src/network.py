@@ -10,10 +10,26 @@ class Node:
         self.edges: list[Edge] = []
         self.passage: int = 0
 
+    """Represents a hub instance at a given discrete time.
+
+    Parameters
+    ----------
+    real_hub : Hub
+        Reference to the static hub model.
+    time : int
+        Discrete time step this node corresponds to.
+    """
+
     def set_previous_connection(self, connection: Connection) -> None:
+        """Record the incoming connection that led to this node.
+
+        This is used to create a waiting/connection edge for restricted
+        zones.
+        """
         self.previous_connection: Connection = connection
 
     def get_remaining_capacity(self) -> int:
+        """Return remaining hub capacity (max_drones - currently used)."""
         return self.real_hub.max_drones - self.passage
 
     @staticmethod
@@ -24,6 +40,7 @@ class Node:
         return hub.zone == Zone.PRIORITY
 
     def sort_edges(self) -> None:
+        """Sort outgoing edges prioritising those that lead to priority."""
         self.edges.sort(key=Node.is_priority_zone, reverse=True)
 
 
@@ -39,7 +56,14 @@ class Edge:
         else:
             self.max_link_capacity = self.node1.real_hub.max_drones
 
+    """Directed edge between two time-expanded nodes.
+
+    If ``real_connection`` is ``None`` the edge represents waiting in the
+    same hub (static transfer) and uses the hub's max_drones for capacity.
+    """
+
     def get_remaining_capacity(self) -> int:
+        """Return remaining capacity on this edge (link capacity - used)."""
         return self.max_link_capacity - self.passage
 
 
@@ -54,12 +78,24 @@ class Network:
         self.end_reached: bool = False
         self.repetition: int = 0
         self.is_running: bool = True
-        self.nodes: dict[int, list[Node]] = {}
+        self.nodes: dict[int, list[Node | ConnectionNode]] = {}
         self.already_created: set[Hub] = set()
         self.start: Node = self.create_node(self.map.start, 0)
 
+    """Builds and manages the time-expanded network for a Map.
+
+    The object creates nodes and edges for each time step on demand and
+    provides `next_step` to progress the expansion. It also detects
+    simple infinite-expansion scenarios to stop the simulation.
+    """
+
     @lru_cache(maxsize=None)
     def create_node(self, hub: Hub, time: int, node_type: type = Node) -> Node:
+        """Create or return a cached `Node` for the given hub and time.
+
+        The function is memoized with ``lru_cache`` so repeated requests
+        for the same (hub, time) pair return the same Node instance.
+        """
         created_node: Node = node_type(hub, time)
         self.nodes.setdefault(time, []).append(created_node)
         if hub is self.map.end:
@@ -69,6 +105,11 @@ class Network:
     @lru_cache(maxsize=None)
     def create_edge(self, connection: Connection | None,
                     node1: Node, node2: Node) -> Edge:
+        """Create or return a cached `Edge` between two nodes.
+
+        Edges are created with an optional underlying ``Connection`` which
+        determines link capacity and semantics.
+        """
         created_edge = Edge(connection, node1, node2)
         return created_edge
 
@@ -92,6 +133,11 @@ class Network:
         node.sort_edges()
 
     def verify_infinite_loop(self) -> None:
+        """Detect repeated expansion without progress and stop the run.
+
+        The method compares the set of hubs created at the current step
+        to previously seen hubs and flags repeated patterns.
+        """
         last_created = set(
             node.real_hub for node in self.nodes.get(self.step, []))
         if last_created.issubset(self.already_created):
@@ -104,6 +150,12 @@ class Network:
             self.already_created.update(last_created)
 
     def next_step(self) -> None:
+        """Expand the network by one time step.
+
+        For each node at the current step add waiting and connection
+        edges for the following time-step. If the end hub hasn't been
+        reached, run the infinite-loop verification logic.
+        """
         for node in self.nodes.get(self.step, []):
             if not isinstance(node, ConnectionNode)\
                     and node.real_hub.zone == Zone.RESTRICTED:

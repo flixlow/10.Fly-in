@@ -50,11 +50,11 @@ class Hub(BaseModel):
 
 
 class Start(Hub):
-    ...
+    """Alias of `Hub` representing the start hub."""
 
 
 class End(Hub):
-    ...
+    """Alias of `Hub` representing the end hub."""
 
 
 class Connection(BaseModel):
@@ -80,3 +80,11 @@ class Map:
         self.start: Start | None = None
         self.end: End | None = None
         self.connections: list[Connection] = []
+        """Top-level container describing a parsed map.
+
+        Parameters
+        ----------
+        name : str
+            Path to the map file or a name used to construct the map
+            title shown in the UI.
+        """
