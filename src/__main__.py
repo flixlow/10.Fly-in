@@ -39,10 +39,10 @@ def main() -> None:
     network = Network(map)
     algo = DFS(network)
 
-    while not network.end_reached:
+    while network.is_running and not network.end_reached:
         network.next_step()
 
-    while algo.max_flow < map.nb_drones:
+    while network.is_running and algo.max_flow < map.nb_drones:
         algo.get_max_flow()
         network.next_step()
 

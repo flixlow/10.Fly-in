@@ -51,7 +51,10 @@ class Network:
         self.map: Map = map
         self.step: int = 0
         self.end_reached: bool = False
+        self.repetition: int = 0
+        self.is_running: bool = True
         self.nodes: dict[int, list[Node]] = {}
+        self.already_created: set[Hub] = set()
         self.start: Node = self.create_node(self.map.start, 0)
 
     @lru_cache(maxsize=None)
@@ -98,4 +101,16 @@ class Network:
                 node.edges.append(new_edge)
             else:
                 self.find_edge(node)
+
+        last_created = set(
+            node.real_hub for node in self.nodes.get(self.step, []))
+        if last_created.issubset(self.already_created):
+            self.repetition += 1
+            if self.repetition >= 3:
+                self.is_running = False
+                return
+        else:
+            self.repetition = 0
+            self.already_created.update(last_created)
+
         self.step += 1

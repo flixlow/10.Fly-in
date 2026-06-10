@@ -34,6 +34,7 @@ References and helpful links:
 - Time-expanded networks & max flow: standard algorithm texts (e.g., CLRS)
 - Pygame docs: https://www.pygame.org/docs/
 - Pydantic docs: https://pydantic-docs.helpmanual.io/
+- fly-in editor: https://flyin-editor.cheznestor.fr/
 
 AI usage
 - AI-assisted for README, docstring

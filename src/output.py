@@ -8,7 +8,7 @@ class Output:
         self.algo: DFS = algo
         self.name = 0
         self.drones: list[Drone] = []
-        self.len_max = max(len(path) for path in algo.paths)
+        self.len_max: int = max((len(path) for path in algo.paths), default=0)
         self.create_drones()
 
     def create_drones(self) -> None:
@@ -36,6 +36,9 @@ class Output:
                             connection = edge.real_connection.name
                             line += "\033[34m"
                             line += f"D{drone.id + 1}-{connection}"
+                        elif node.real_hub.zone == Zone.PRIORITY:
+                            line += "\033[31m"
+                            line += f"D{drone.id + 1}-{node.real_hub.name}"
                         else:
                             line += "\033[35m"
                             line += f"D{drone.id + 1}-{node.real_hub.name}"

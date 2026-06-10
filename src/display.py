@@ -143,7 +143,7 @@ class Displayer:
     def display(self) -> None:
         clock = pygame.time.Clock()
         running = True
-        max_path_len = max([len(path) for path in self.paths])
+        max_path_len = max((len(path) for path in self.paths), default=0)
         while running:
             self.screen.fill(self.back_color)
             for event in pygame.event.get():
