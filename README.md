@@ -48,6 +48,7 @@ make install
 	```bash
 	make clean
 	make lint
+  make lint-strict
 	```
 
 ## Ressources

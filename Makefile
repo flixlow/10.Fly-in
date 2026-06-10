@@ -15,10 +15,10 @@ clean:
 	rm -rf .venv
 	rm -rf maps
 
-lint:
+lint: install
 	uv run flake8 src && uv run mypy src --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
-lint-strict:
+lint-strict: install
 	uv run flake8 src && uv run mypy src --strict
 
 map: maps/.installed
