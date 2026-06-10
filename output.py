@@ -24,35 +24,20 @@ class Drone:
 
 
 class Output:
-    """Create textual output for the simulation results.
-
-    The ``Output`` object translates the algorithm's found paths and
-    flows into a list of :class:`Drone` instances and prints a step-by-step
-    description of movements.
-
-    Parameters
-    ----------
-    map : Map
-        The map instance containing start, hubs and drone count.
-    algo : DFS
-        The algorithm instance containing computed paths, flows and network.
-
-    Attributes
-    ----------
-    map : Map
-        Reference to the provided map.
-    algo : DFS
-        Reference to the provided algorithm instance.
-    name : int
-        Counter used to assign incremental drone ids.
-    step : int
-        Current printed time-step.
-    drones : list[Drone]
-        List of created Drone instances based on path flows.
-    len_max : int
-        Maximum path length used to limit printed steps.
-    """
     def __init__(self, map: Map, algo: DFS) -> None:
+        """Create textual output for the simulation results.
+
+        The ``Output`` object translates the algorithm's found paths and
+        flows into a list of :class:`Drone` instances and prints a step-by-step
+        description of movements.
+
+        Parameters
+        ----------
+        map : Map
+            The map instance containing start, hubs and drone count.
+        algo : DFS
+            The algorithm instance containing computed paths,flows and network.
+        """
         self.map: Map = map
         self.algo: DFS = algo
         self.name: int = 0
@@ -67,10 +52,6 @@ class Output:
         Drones are created until the map's ``nb_drones`` count is reached.
         Each path in ``algo.paths`` is repeated according to the corresponding
         flow value in ``algo.flow_by_paths``.
-
-        Returns
-        -------
-        None
         """
         for path, flow in zip(self.algo.paths, self.algo.flow_by_paths):
             for i in range(flow):

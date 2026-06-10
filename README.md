@@ -58,6 +58,7 @@ make install
 - Algorithmes de flot : documentation et articles sur Edmonds–Karp, Dinic et flots sur réseaux (ouvrages et articles en ligne).
 - Pygame : https://www.pygame.org/
 - Pydantic : https://docs.pydantic.dev/
+- Questionary : https://questionary.readthedocs.io/en/stable/
 
 Utilisation de l'IA :
 - J'ai utilisé une assistance IA pour rédiger et structurer ce fichier `README.md` ainsi que les docstrings (description, sections,
