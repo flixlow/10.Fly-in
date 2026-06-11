@@ -5,20 +5,19 @@ from functools import lru_cache
 
 class Node:
     def __init__(self, real_hub: Hub, time: int) -> None:
+        """Represents a hub instance at a given discrete time.
+
+        Parameters
+        ----------
+        real_hub : Hub
+            Reference to the static hub model.
+        time : int
+            Discrete time step this node corresponds to.
+        """
         self.real_hub: Hub = real_hub
         self.time: int = time
         self.edges: list[Edge] = []
         self.passage: int = 0
-
-    """Represents a hub instance at a given discrete time.
-
-    Parameters
-    ----------
-    real_hub : Hub
-        Reference to the static hub model.
-    time : int
-        Discrete time step this node corresponds to.
-    """
 
     def set_previous_connection(self, connection: Connection) -> None:
         """Record the incoming connection that led to this node.
@@ -34,6 +33,15 @@ class Node:
 
     @staticmethod
     def is_priority_zone(edge: Edge) -> bool:
+        """Return True if the edge leads to a priority zone.
+
+        Args:
+            edge (Edge): Edge to inspect.
+
+        Returns:
+            bool: ``True`` if the destination hub's zone is
+                ``Zone.PRIORITY``, otherwise ``False``.
+        """
         if edge.real_connection is None:
             return False
         hub = edge.real_connection.end
@@ -47,6 +55,11 @@ class Node:
 class Edge:
     def __init__(self, connection: Connection | None,
                  node1: Node, node2: Node) -> None:
+        """Directed edge between two time-expanded nodes.
+
+        If ``real_connection`` is ``None`` the edge represents waiting in the
+        same hub (static transfer) and uses the hub's max_drones for capacity.
+        """
         self.real_connection: Connection | None = connection
         self.node1: Node = node1
         self.node2: Node = node2
@@ -55,12 +68,6 @@ class Edge:
             self.max_link_capacity = self.real_connection.max_link_capacity
         else:
             self.max_link_capacity = self.node1.real_hub.max_drones
-
-    """Directed edge between two time-expanded nodes.
-
-    If ``real_connection`` is ``None`` the edge represents waiting in the
-    same hub (static transfer) and uses the hub's max_drones for capacity.
-    """
 
     def get_remaining_capacity(self) -> int:
         """Return remaining capacity on this edge (link capacity - used)."""
@@ -73,6 +80,12 @@ class ConnectionNode(Node):
 
 class Network:
     def __init__(self, map: Map) -> None:
+        """Builds and manages the time-expanded network for a Map.
+
+        The object creates nodes and edges for each time step on demand and
+        provides `next_step` to progress the expansion. It also detects
+        simple infinite-expansion scenarios to stop the simulation.
+        """
         self.map: Map = map
         self.step: int = 0
         self.end_reached: bool = False
@@ -81,13 +94,6 @@ class Network:
         self.nodes: dict[int, list[Node | ConnectionNode]] = {}
         self.already_created: set[Hub] = set()
         self.start: Node = self.create_node(self.map.start, 0)
-
-    """Builds and manages the time-expanded network for a Map.
-
-    The object creates nodes and edges for each time step on demand and
-    provides `next_step` to progress the expansion. It also detects
-    simple infinite-expansion scenarios to stop the simulation.
-    """
 
     @lru_cache(maxsize=None)
     def create_node(self, hub: Hub, time: int, node_type: type = Node) -> Node:
@@ -114,6 +120,21 @@ class Network:
         return created_edge
 
     def find_edge(self, node: Node) -> None:
+        """edges for a time-expanded node from its real hub connections.
+
+        For each :class:`Connection` associated with the node's real hub:
+        - creates a waiting edge from the node to the same hub at t + 1;
+        - creates a movement edge from the node to the connected hub at t + 1;
+        - records the connection that led to the new node;
+        - appends both edges to ``node.edges``;
+        - sorts the outgoing edges to prefer priority zones.
+
+        Args:
+            node (Node): The time-expanded node.
+
+        Returns:
+            None
+        """
         for connection in node.real_hub.connections:
             if node.real_hub is connection.start:
                 start = connection.start
