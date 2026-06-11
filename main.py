@@ -80,8 +80,9 @@ if __name__ == "__main__":
     print("\033[1;32m[START]\033[0m")
     try:
         main()
+    except KeyboardInterrupt:
+        print("\033[1;32m[END]\033[0m")
     except Exception as e:
-        raise e
         print(f"\033[1;31m[ERROR] - {type(e).__name__}\033[0m\n{e}")
     else:
         print("\033[1;32m[END]\033[0m")
