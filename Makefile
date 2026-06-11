@@ -12,7 +12,7 @@ install: map
 	uv sync
 
 debug:
-	uv run pdb main.py
+	uv run -m pdb main.py
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
