@@ -82,7 +82,7 @@ class Output:
         path = drone.path
         node = path[self.step][1]
         if self.step == (len(path) - 1):
-            return f"\033[35mD{drone.id + 1}-{node.real_hub.name} "
+            return f"\033[35mD{drone.id + 1}-{node.real_hub.name}\033[0m "
         next_node = path[self.step + 1][1]
         if node.real_hub.zone == Zone.RESTRICTED and\
                 isinstance(next_node, ConnectionNode):
