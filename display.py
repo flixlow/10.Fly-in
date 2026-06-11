@@ -1,5 +1,5 @@
-from network import Edge, Node
-from utils import Map, Hub
+from network import Edge, Node, ConnectionNode
+from utils import Map, Hub, Zone
 import pygame
 import json
 
@@ -195,7 +195,13 @@ class Displayer:
         if self.step >= len(path):
             return path[-1][1].real_hub
 
-        return path[self.step][1].real_hub
+        node = path[self.step][1]
+
+        if node.real_hub.zone == Zone.RESTRICTED and \
+                not isinstance(node, ConnectionNode):
+            return node.previous_connection.start
+
+        return node.real_hub
 
     def display_drones(self) -> None:
         """Draw drone icons at the current hub for each path."""
